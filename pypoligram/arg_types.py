@@ -50,5 +50,8 @@ class ClientArgTypes(TypedDict, total=False):
 	loop: Optional[asyncio.AbstractEventLoop]
 
 __fullargspec = inspect.getfullargspec(Client)
+if __fullargspec.defaults is None:
+    # pyromod patched the client and we cannot access it
+    __fullargspec = inspect.getfullargspec(Client.old__init__)
 __diff: int = len(__fullargspec.args) - len(__fullargspec.defaults)
 default_args: ClientArgTypes = {arg[0]: arg[1] for arg in zip(__fullargspec.args[__diff:], __fullargspec.defaults)}
