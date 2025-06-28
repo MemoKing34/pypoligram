@@ -1,0 +1,46 @@
+version = 1
+revision = 1
+requires-python = ">=3.12"
+
+[[package]]
+name = "kurigram"
+version = "2.2.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyaes" },
+    { name = "pysocks" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f2/ac/f95f2a6dd1634224a31b7a0eb218e6181ac38c03363956b2bcd7bac7c0b0/kurigram-2.2.1.tar.gz", hash = "sha256:63fae5471d3824d5e08188180edf21ecfe13ed1bb53504308d0015469e4c9581", size = 527783 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/21/5f/0ea1fb36596ed756b122212e34d1786c96adf4ee9a3f5532c9d3f6833812/kurigram-2.2.1-py3-none-any.whl", hash = "sha256:94c9f23ee5cd2a868a557929b3ecf24fb4ff530a7f0a0f633676db2391fc9545", size = 4792260 },
+]
+
+[[package]]
+name = "pyaes"
+version = "1.6.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/44/66/2c17bae31c906613795711fc78045c285048168919ace2220daa372c7d72/pyaes-1.6.1.tar.gz", hash = "sha256:02c1b1405c38d3c370b085fb952dd8bea3fadcee6411ad99f312cc129c536d8f", size = 28536 }
+
+[[package]]
+name = "pypoligram"
+version = "0.1.0"
+source = { virtual = "." }
+
+[package.dev-dependencies]
+dev = [
+    { name = "kurigram" },
+]
+
+[package.metadata]
+
+[package.metadata.requires-dev]
+dev = [{ name = "kurigram", specifier = ">=2.2.1" }]
+
+[[package]]
+name = "pysocks"
+version = "1.7.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/bd/11/293dd436aea955d45fc4e8a35b6ae7270f5b8e00b53cf6c024c83b657a11/PySocks-1.7.1.tar.gz", hash = "sha256:3f8804571ebe159c380ac6de37643bb4685970655d3bba243530d6558b799aa0", size = 284429 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8d/59/b4572118e098ac8e46e399a1dd0f2d85403ce8bbaad9ec79373ed6badaf9/PySocks-1.7.1-py3-none-any.whl", hash = "sha256:2725bd0a9925919b9b51739eea5f9e2bae91e83288108a9ad338b2e3a4435ee5", size = 16725 },
+]

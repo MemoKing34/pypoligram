@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pypoligram"
+version = "0.1.0"
+description = "Simplifies the process of handling multiple clients"
+readme = "README.md"
+license = { file = "COPYING" }
+authors = [
+  { name = "MemoKing34", email = "karam24@itu.edu.tr" }
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "kurigram>=2.2.1"
+]
+
+[project.urls]
+Homepage = "https://github.com/MemoKing34/pypoligram"
+Repository = "https://github.com/MemoKing34/pypoligram"
+Documentation = "https://github.com/MemoKing34/pypoligram/blob/main/DOCUMENTATION.md"
