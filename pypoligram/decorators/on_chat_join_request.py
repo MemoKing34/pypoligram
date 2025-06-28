@@ -1,17 +1,19 @@
-from typing import Callable, Union, Optional
+from collections.abc import Callable
+from typing import Union
 
 import pyrogram
 from pyrogram.filters import Filter
 
 import pypoligram
-from pypoligram.filters import ALL, Filter as PFilter
+from pypoligram.filters import ALL
+from pypoligram.filters import Filter as PFilter
 
 
 class OnChatJoinRequest:
 	def on_chat_join_request(
 		self: Union["OnChatJoinRequest", PFilter, Filter, None] = None,
-		client_filters: Union[PFilter, Filter, None] = None,
-		filters: Optional[Filter] = None,
+		client_filters: PFilter | Filter | None = None,
+		filters: Filter | None = None,
 		group: int = 0
 	) -> Callable:
 		"""Decorator for handling chat join requests.

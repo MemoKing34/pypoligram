@@ -1,28 +1,9 @@
-import asyncio
 import inspect
 import logging
-from collections import OrderedDict
 
 import pyrogram
-from pyrogram import dispatcher, utils
-from pyrogram.handlers import (CallbackQueryHandler, ChatJoinRequestHandler,
-							   ChatMemberUpdatedHandler,
-							   ChosenInlineResultHandler,
-							   DeletedMessagesHandler, EditedMessageHandler,
-							   InlineQueryHandler, MessageHandler, PollHandler,
-							   RawUpdateHandler, UserStatusHandler)
-from pyrogram.raw.types import (UpdateBotCallbackQuery,
-								UpdateBotChatInviteRequester,
-								UpdateBotInlineQuery, UpdateBotInlineSend,
-								UpdateChannelParticipant,
-								UpdateChatParticipant,
-								UpdateDeleteChannelMessages,
-								UpdateDeleteMessages, UpdateEditChannelMessage,
-								UpdateEditMessage,
-								UpdateInlineBotCallbackQuery,
-								UpdateMessagePoll, UpdateNewChannelMessage,
-								UpdateNewMessage, UpdateNewScheduledMessage,
-								UpdateUserStatus)
+from pyrogram import dispatcher
+from pyrogram.handlers import RawUpdateHandler
 
 import pypoligram
 
@@ -32,7 +13,7 @@ class Dispatcher(dispatcher.Dispatcher):
 	def __init__(self, client: "pyrogram.Client", clients: "pypoligram.ClientManager") -> None:
 		self.clients = clients
 		super().__init__(client)
-	
+
 	async def handler_worker(self, lock):
 		while True:
 			packet = await self.updates_queue.get()

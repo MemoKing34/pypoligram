@@ -1,13 +1,15 @@
-from typing import Callable, Optional, Union
+from collections.abc import Callable
+from typing import Union
 
 import pyrogram
 
 import pypoligram
-from pypoligram.filters import ALL, Filter as PFilter
+from pypoligram.filters import ALL
+from pypoligram.filters import Filter as PFilter
 
 
 class OnDisconnect:
-	def on_disconnect(self: Union["OnDisconnect", PFilter, None] = None, client_filters: Optional[PFilter] = None):
+	def on_disconnect(self: Union["OnDisconnect", PFilter, None] = None, client_filters: PFilter | None = None):
 		"""Decorator for handling disconnections.
   
 		This does the same thing as :meth:`~pypoligram.ClientManager.add_handler` using the
@@ -28,9 +30,9 @@ class OnDisconnect:
 					func.handlers = []
 				if isinstance(self, PFilter) or self is None:
 					client_filters, self = self, client_filters
-				
+
 				func.handlers.append((client_filters or ALL, pyrogram.handlers.DisconnectHandler(func), 0))
-			
+
 			return func
-		
+
 		return decorator

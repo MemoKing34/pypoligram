@@ -1,14 +1,14 @@
 import inspect
 
 try:
-	from pyrogram.sync import async_to_sync #type: ignore
+	from pyrogram.sync import async_to_sync  #type: ignore
 except ImportError:
 	def async_to_sync(source, name):
 		"""if we can't import it, we will just pass it.
 		"""
-		pass
 
 from .clients import ClientManager
+
 
 def wrap(source):
 	for name in dir(source):

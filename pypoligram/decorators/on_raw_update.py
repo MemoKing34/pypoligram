@@ -1,17 +1,19 @@
-from typing import Callable, Union, Optional
+from collections.abc import Callable
+from typing import Union
 
 import pyrogram
 from pyrogram.filters import Filter
 
 import pypoligram
-from pypoligram.filters import ALL, Filter as PFilter
+from pypoligram.filters import ALL
+from pypoligram.filters import Filter as PFilter
 
 
 class OnRawUpdate:
 	def on_raw_update(
-			self: Union["OnRawUpdate", PFilter, Filter, None] = None, 
-			client_filters: Union[PFilter, Filter, None] = None, 
-			filters: Optional[Filter] = None,
+			self: Union["OnRawUpdate", PFilter, Filter, None] = None,
+			client_filters: PFilter | Filter | None = None,
+			filters: Filter | None = None,
 			group: int = 0
 		) -> Callable:
 		"""Decorator for handling raw updates.
@@ -45,15 +47,15 @@ class OnRawUpdate:
 					filters, self = self, filters
 				if isinstance(self, int):
 					group = self or 0
-				
+
 				func.handlers.append(
 					(
-						client_filters or ALL, 
+						client_filters or ALL,
 						pyrogram.handlers.RawUpdateHandler(func, filters),
 						group
 					)
 				)
-			
+
 			return func
-		
+
 		return decorator

@@ -1,5 +1,4 @@
-import inspect
-from typing import Callable, List, Union
+from collections.abc import Callable
 
 import pyrogram
 from pyrogram.filters import Filter, create
@@ -128,8 +127,8 @@ class client(Filter, set):
 		clients (``str`` | ``list``):
 			A string or a list of strings containing the names of the clients to filter.
    	"""
-    
-	def __init__(self, clients: Union[str, List[str]]):
+
+	def __init__(self, clients: str | list[str]):
 		clients = [] if clients is None else clients if isinstance(clients, list) else [clients]
 		super().__init__(clients)
 

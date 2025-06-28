@@ -1,24 +1,21 @@
 import asyncio
 import inspect
-from importlib import import_module
 import logging
-import os
+from collections.abc import Iterable
 from concurrent.futures.thread import ThreadPoolExecutor
+from importlib import import_module
 from pathlib import Path
-from typing import AsyncIterable, Iterable, List, Set, Tuple, Self
+from typing import Self
 
-import pyrogram
-from pyrogram import Client, compose, idle
+from pyrogram import Client
 from pyrogram.dispatcher import Dispatcher
 from pyrogram.handlers.handler import Handler
 
-import pypoligram
-
-from .filters import Filter, ALL as pALL
+from .arg_types import ClientArgTypes, default_args
 from .decorators import Decorators
 from .dispatcher import Dispatcher as PDispatcher
-from .arg_types import ClientArgTypes, default_args
-
+from .filters import ALL as pALL
+from .filters import Filter
 
 log = logging.getLogger(__name__)
 
@@ -54,16 +51,16 @@ class ClientManager(Decorators):
 	"""
 
 	def __init__(
-     	self, 
-      	clients: Iterable[Client] = None, *, 
+     	self,
+      	clients: Iterable[Client] = None, *,
        	name: str = "Clients",
-		plugins: dict = None, 
+		plugins: dict = None,
   		dont_modify: bool = False,
 		kwargs: ClientArgTypes = None
   	):
 		if kwargs is None:
 			kwargs = {}
-		self._clients: Set[Client] = set()
+		self._clients: set[Client] = set()
 		self.name = str(name)
 		self.executor = ThreadPoolExecutor(4, thread_name_prefix="Clients")
 		self.loop = asyncio.get_event_loop()
@@ -104,7 +101,7 @@ class ClientManager(Decorators):
 		if not self.dont_modify:
 			client.dispatcher = PDispatcher(client, self)
 		client.plugins = None if self.plugins else client.plugins
-		setattr(client, '_clients', self)
+		client._clients = self
 		if not dont_add_kwargs:
 			if self._kwargs:
 				for name, value in self._kwargs.items():
@@ -152,7 +149,7 @@ class ClientManager(Decorators):
 			pass
 		return client
 
-	def add_handler(self, handler: Handler, filters: Filter = pALL, group: int = 0, **kwargs) -> Tuple[Handler, int]:
+	def add_handler(self, handler: Handler, filters: Filter = pALL, group: int = 0, **kwargs) -> tuple[Handler, int]:
 		"""Register an update handler to multiple clients.
   
 		You can use it just like :meth:`pyrogram.Client.add_handler` but it will register the handler to all clients in
@@ -316,8 +313,7 @@ class ClientManager(Decorators):
 									count += 1
 						except Exception:
 							if warn_non_existent_functions:
-								log.warning('[{}] [MULTILOAD] Ignoring non-existent function "{}" from "{}"'.format(
-									self.name, name, module_path))
+								log.warning(f'[{self.name}] [MULTILOAD] Ignoring non-existent function "{name}" from "{module_path}"')
 
 			if exclude:
 				for path, handlers in exclude:
@@ -351,8 +347,7 @@ class ClientManager(Decorators):
 									count -= 1
 						except Exception:
 							if warn_non_existent_functions:
-								log.warning('[{}] [MULTIUNLOAD] Ignoring non-existent function "{}" from "{}"'.format(
-									self.name, name, module_path))
+								log.warning(f'[{self.name}] [MULTIUNLOAD] Ignoring non-existent function "{name}" from "{module_path}"')
 
 			if count > 0:
 				log.info('[{}] Successfully loaded {} plugin{} from "{}"'.format(
@@ -493,7 +488,7 @@ class ClientManager(Decorators):
 			await do_it()
 		else:
 			self.loop.create_task(do_it())
-   
+
 		return self
 
 	async def restart(self, sequential: bool = False, block: bool = True) -> Self:
@@ -546,12 +541,12 @@ class ClientManager(Decorators):
 					await client.restart()
 				return self
 			await asyncio.gather(*[client.restart() for client in self])
-   
+
 		if block:
 			await do_it()
 		else:
 			self.loop.create_task(do_it())
-   
+
 		return self
 
 	async def restart2(self, sequential: bool = False, block: bool = True) -> Self:
@@ -602,12 +597,12 @@ class ClientManager(Decorators):
 		async def do_it():
 			await self.stop(sequential=sequential)
 			await self.start(sequential=sequential)
-   
+
 		if block:
 			await do_it()
 		else:
 			self.loop.create_task(do_it())
-   
+
 		return self
 
 	def run(self, coroutine=None, /, *, sequential: bool = False) -> None:
@@ -670,12 +665,11 @@ class ClientManager(Decorators):
 
 		if coroutine is not None:
 			run(coroutine)
+		elif inspect.iscoroutinefunction(self.start):
+			run(self.start(sequential))
+			run(idle())
+			run(self.stop(sequential=sequential))
 		else:
-			if inspect.iscoroutinefunction(self.start):
-				run(self.start(sequential))
-				run(idle())
-				run(self.stop(sequential=sequential))
-			else:
-				self.start(sequential)
-				run(idle())
-				self.stop(sequential=sequential)
+			self.start(sequential)
+			run(idle())
+			self.stop(sequential=sequential)
