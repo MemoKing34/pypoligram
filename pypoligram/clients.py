@@ -7,7 +7,7 @@ from importlib import import_module
 from pathlib import Path
 from typing import Self
 
-from pyrogram import Client
+from pyrogram import Client, compose, idle
 from pyrogram.dispatcher import Dispatcher
 from pyrogram.handlers.handler import Handler
 
