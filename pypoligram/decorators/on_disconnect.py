@@ -24,14 +24,14 @@ class OnDisconnect:
 		def decorator(func: Callable) -> Callable:
 			nonlocal self, client_filters
 			if isinstance(self, pypoligram.ClientManager):
-				self.add_handler(client_filters or ALL, pyrogram.handlers.DisconnectHandler(func))
+				self.add_handler(pyrogram.handlers.DisconnectHandler(func), client_filters or ALL)
 			else:
 				if not hasattr(func, "handlers"):
 					func.handlers = []
 				if isinstance(self, PFilter) or self is None:
 					client_filters, self = self, client_filters
 
-				func.handlers.append((client_filters or ALL, pyrogram.handlers.DisconnectHandler(func), 0))
+				func.handlers.append((pyrogram.handlers.DisconnectHandler(func), client_filters or ALL, 0))
 
 			return func
 

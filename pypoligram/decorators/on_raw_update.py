@@ -37,7 +37,7 @@ class OnRawUpdate:
 		def decorator(func: Callable) -> Callable:
 			nonlocal self, client_filters, filters, group
 			if isinstance(self, pypoligram.ClientManager):
-				self.add_handler(client_filters or ALL, pyrogram.handlers.RawUpdateHandler(func, filters), group)
+				self.add_handler(pyrogram.handlers.RawUpdateHandler(func, filters), client_filters or ALL, group)
 			elif isinstance(self, Union[PFilter, Filter]) or self is None:
 				if not hasattr(func, "handlers"):
 					func.handlers = []
@@ -50,8 +50,8 @@ class OnRawUpdate:
 
 				func.handlers.append(
 					(
-						client_filters or ALL,
 						pyrogram.handlers.RawUpdateHandler(func, filters),
+						client_filters or ALL,
 						group
 					)
 				)

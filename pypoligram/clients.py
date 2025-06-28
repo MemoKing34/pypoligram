@@ -183,7 +183,7 @@ class ClientManager(Decorators):
 					Client("my_account2"),
 				])
 	
-				manager.add_handler(pfilters.client("my_account1"), MessageHandler(hello), group=1)
+				manager.add_handler(MessageHandler(hello), pfilters.client("my_account1"), group=1)
 	
 				manager.run()
 		"""
@@ -273,7 +273,7 @@ class ClientManager(Decorators):
 						try:
 							for filters, handler, group in getattr(module, name).handlers:
 								if isinstance(handler, Handler) and isinstance(group, int):
-									self.add_handler(filters, handler, group, name=name, module_path=module_path)
+									self.add_handler(handler, filters, group, name=name, module_path=module_path)
 
 									# log.info('[{}] [MULTILOAD] {}("{}") in group {} from "{}"'.format(
 									#	self.name, type(handler).__name__, name, group, module_path))

@@ -165,8 +165,8 @@ def echo(manager, client, message):
 def iamgroot(manager, client, message):
     message.reply("I AM GROOT!")
 
-manager.add_handler(pfilters.BOT, MessageHandler(echo))
-manager.add_handler(pfilters.client("groot"), MessageHandler(iamgroot))
+manager.add_handler(MessageHandler(echo), pfilters.BOT)
+manager.add_handler(MessageHandler(iamgroot), pfilters.client("groot"))
 
 manager.run()
 ```
@@ -378,6 +378,6 @@ manager = ClientManager([
     Client("my_account2"),
 ])
 
-manager.add_handler(pfilters.client("my_account1"), MessageHandler(hello))
+manager.add_handler(MessageHandler(hello), pfilters.client("my_account1"))
 manager.run()
 ```
