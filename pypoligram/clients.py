@@ -225,7 +225,7 @@ class ClientManager(Decorators):
 					Client("my_account2"),
 				])
 	
-				handler = manager.add_handler(pfilters.client("my_account1"), MessageHandler(hello))
+				handler = manager.add_handler(MessageHandler(hello), pfilters.client("my_account1"))
 	
 				# Starred expression to unpack (handler, group)
 				manager.remove_handler(*handler)
@@ -271,7 +271,7 @@ class ClientManager(Decorators):
 					for name in vars(module).keys():
 						# noinspection PyBroadException
 						try:
-							for filters, handler, group in getattr(module, name).handlers:
+							for handler, filters, group in getattr(module, name).handlers:
 								if isinstance(handler, Handler) and isinstance(group, int):
 									self.add_handler(handler, filters, group, name=name, module_path=module_path)
 
