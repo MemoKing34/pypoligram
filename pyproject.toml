@@ -25,4 +25,4 @@ path = "pypoligram/__init__.py"
 [project.urls]
 Homepage = "https://github.com/MemoKing34/pypoligram"
 Repository = "https://github.com/MemoKing34/pypoligram"
-Documentation = "https://github.com/MemoKing34/pypoligram/blob/main/DOCUMENTATION.md"
+Documentation = "https://github.com/MemoKing34/pypoligram/blob/master/DOCUMENTATION.md"
