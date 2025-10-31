@@ -44,7 +44,7 @@ I don't know how to set a documentation page but I will write a [DOCUMENTATION.m
 
 ## Contributions
 
-Contributions are welcome! I don't have much information about developing the project, and I need help improving the documentation page. If you have any ideas or encounter any issues, please share them on the Issues and Pull Requests page. You can also star this project to motivate me and help me focus on it more.
+Contributions are welcome! I don't have much information about developing a project, and I need help improving the documentation page. If you have any ideas or encounter any issues, please share them on the Issues and Pull Requests page. You can also star this project to motivate me and help me focus on it more.
 
 ## License
 
