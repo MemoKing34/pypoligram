@@ -9,7 +9,7 @@ from pypoligram.filters import Filter as PFilter
 
 
 class OnDisconnect:
-	def on_disconnect(self: Union["OnDisconnect", PFilter, None] = None, client_filters: PFilter | None = None):
+	def on_disconnect(self: Union["OnDisconnect", PFilter, None] = None, client_filters: Union[PFilter, None] = None):
 		"""Decorator for handling disconnections.
   
 		This does the same thing as :meth:`~pypoligram.ClientManager.add_handler` using the

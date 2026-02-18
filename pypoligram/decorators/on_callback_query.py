@@ -12,8 +12,8 @@ from pypoligram.filters import Filter as PFilter
 class OnCallbackQuery:
 	def on_callback_query(
 		self: Union["OnCallbackQuery", PFilter, Filter, None] = None,
-		client_filters: PFilter | Filter | None = None,
-		filters: Filter | None = None,
+		client_filters: Union[PFilter, Filter, None] = None,
+		filters: Union[Filter, None] = None,
 		group: int = 0
 	) -> Callable:
 		"""Decorator for handling callback queries.

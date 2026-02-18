@@ -12,8 +12,8 @@ from pypoligram.filters import Filter as PFilter
 class OnChatJoinRequest:
 	def on_chat_join_request(
 		self: Union["OnChatJoinRequest", PFilter, Filter, None] = None,
-		client_filters: PFilter | Filter | None = None,
-		filters: Filter | None = None,
+		client_filters: Union[PFilter, Filter, None] = None,
+		filters: Union[Filter, None] = None,
 		group: int = 0
 	) -> Callable:
 		"""Decorator for handling chat join requests.

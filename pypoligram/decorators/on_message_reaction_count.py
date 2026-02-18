@@ -12,8 +12,8 @@ from pypoligram.filters import Filter as PFilter
 class OnMessageReactionCount:
 	def on_message_reaction_count(
 		self: Union["OnMessageReactionCount", PFilter, Filter, None] = None,
-		client_filters: PFilter | Filter | None = None,
-		filters: Filter | None = None,
+		client_filters: Union[PFilter, Filter, None] = None,
+		filters: Union[Filter, None] = None,
 		group: int = 0
 	) -> Callable:
 		"""Decorator for handling message reaction counts.

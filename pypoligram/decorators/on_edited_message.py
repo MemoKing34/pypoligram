@@ -12,8 +12,8 @@ from pypoligram.filters import Filter as PFilter
 class OnEditedMessage:
 	def on_edited_message(
 		self: Union["OnEditedMessage", PFilter, Filter, None] = None,
-		client_filters: PFilter | Filter | None = None,
-		filters: Filter | None = None,
+		client_filters: Union[PFilter, Filter, None] = None,
+		filters: Union[Filter, None] = None,
 		group: int = 0
 	) -> Callable:
 		"""Decorator for handling edited messages.

@@ -5,7 +5,10 @@ from collections.abc import Iterable
 from concurrent.futures.thread import ThreadPoolExecutor
 from importlib import import_module
 from pathlib import Path
-from typing import Self
+try:
+    from typing import Self
+except ImportError:
+    from typing_extensions import Self
 
 from pyrogram import Client, compose, idle
 from pyrogram.dispatcher import Dispatcher

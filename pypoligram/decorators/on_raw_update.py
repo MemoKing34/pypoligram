@@ -11,11 +11,11 @@ from pypoligram.filters import Filter as PFilter
 
 class OnRawUpdate:
 	def on_raw_update(
-			self: Union["OnRawUpdate", PFilter, Filter, None] = None,
-			client_filters: PFilter | Filter | None = None,
-			filters: Filter | None = None,
-			group: int = 0
-		) -> Callable:
+		self: Union["OnRawUpdate", PFilter, Filter, None] = None,
+		client_filters: Union[PFilter, Filter, None] = None,
+		filters: Union[Filter, None] = None,
+		group: int = 0
+	) -> Callable:
 		"""Decorator for handling raw updates.
   
 		This does the same thing as :meth:`~pypoligram.ClientManager.add_handler` using the
