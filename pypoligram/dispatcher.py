@@ -54,7 +54,7 @@ class Dispatcher(dispatcher.Dispatcher):
 								if inspect.iscoroutinefunction(handler.callback):
 									await handler.callback(self.clients, self.client, *args)
 								else:
-									await self.loop.run_in_executor(
+									await self.client.loop.run_in_executor(
 										self.client.executor,
 										handler.callback,
 										self.clients,
