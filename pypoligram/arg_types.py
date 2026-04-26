@@ -1,53 +1,56 @@
 import asyncio
 import inspect
 from pathlib import Path
-from typing import Optional, TypedDict, Union
+from typing import Optional, Type, TypedDict, Union
 
 from pyrogram import Client, enums, raw
 from pyrogram.connection import Connection
 from pyrogram.connection.transport import TCP
 from pyrogram.storage import Storage
+from pyrogram.types import LinkPreviewOptions
 
 
 class ClientArgTypes(TypedDict, total=False):
-	api_id: Union[int, str, None]
-	api_hash: Union[str, None]
+	api_id: Optional[Union[int, str]]
+	api_hash: Optional[str]
 	app_version: str
 	device_model: str
 	system_version: str
 	lang_pack: str
 	lang_code: str
 	system_lang_code: str
-	ipv6: Union[bool, None]
-	proxy: Union[dict, None]
-	test_mode: Union[bool, None]
-	bot_token: Union[str, None]
-	session_string: Union[str, None]
-	in_memory: Union[bool, None]
-	phone_number: Union[str, None]
-	phone_code: Union[str, None]
-	password: Union[str, None]
+	ipv6: Optional[bool]
+	proxy: Optional[dict]
+	test_mode: Optional[bool]
+	bot_token: Optional[str]
+	session_string: Optional[str]
+	in_memory: Optional[bool]
+	phone_number: Optional[str]
+	phone_code: Optional[str]
+	password: Optional[str]
 	workers: int
 	workdir: Union[str, Path]
-	plugins: Union[dict, None]
+	plugins: Optional[dict]
 	parse_mode: "enums.ParseMode"
-	no_updates: Union[bool, None]
-	skip_updates: Union[bool, None]
-	takeout: Union[bool, None]
+	no_updates: Optional[bool]
+	skip_updates: Optional[bool]
+	takeout: Optional[bool]
 	sleep_threshold: int
-	hide_password: Union[bool, None]
+	hide_password: Optional[bool]
 	max_concurrent_transmissions: int
 	max_message_cache_size: int
 	max_topic_cache_size: int
-	storage_engine: Union[Storage, None]
+	storage_engine: Optional[Storage]
 	client_platform: "enums.ClientPlatform"
-	fetch_replies: Union[bool, None]
-	fetch_topics: Union[bool, None]
-	fetch_stories: Union[bool, None]
-	init_connection_params: Optional["raw.base.JSONValue"]
-	connection_factory: type[Connection]
-	protocol_factory: type[TCP]
-	loop: Union[asyncio.AbstractEventLoop, None]
+	link_preview_options: Optional[LinkPreviewOptions]
+	fetch_replies: Optional[bool]
+	fetch_topics: Optional[bool]
+	fetch_stories: Optional[bool]
+	fetch_stickers: Optional[bool]
+	init_connection_params: Optional[dict]
+	connection_factory: Type[Connection]
+	protocol_factory: Type[TCP]
+	loop: Optional[asyncio.AbstractEventLoop]
 
 __fullargspec = inspect.getfullargspec(Client)
 if __fullargspec.defaults is None:
