@@ -5,9 +5,10 @@ from collections.abc import Iterable
 from concurrent.futures.thread import ThreadPoolExecutor
 from importlib import import_module
 from pathlib import Path
-try:
+import sys
+if sys.version_info >= (3, 11):
     from typing import Self
-except ImportError:
+else:
     from typing_extensions import Self
 
 from pyrogram import Client, compose, idle
@@ -18,7 +19,7 @@ from .arg_types import ClientArgTypes, default_args
 from .decorators import Decorators
 from .dispatcher import Dispatcher as PDispatcher
 from .filters import ALL as pALL
-from .filters import Filter
+from .filters import Filter as PFilter
 
 log = logging.getLogger(__name__)
 
@@ -152,7 +153,7 @@ class ClientManager(Decorators):
 			pass
 		return client
 
-	def add_handler(self, handler: Handler, filters: Filter = pALL, group: int = 0, **kwargs) -> tuple[Handler, int]:
+	def add_handler(self, handler: Handler, filters: PFilter = pALL, group: int = 0, **kwargs) -> tuple[Handler, int]:
 		"""Register an update handler to multiple clients.
   
 		You can use it just like :meth:`pyrogram.Client.add_handler` but it will register the handler to all clients in
