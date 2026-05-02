@@ -8,36 +8,41 @@ from pypoligram.filters import ALL
 from pypoligram.filters import Filter as PFilter
 
 
-class OnPoll:
-	def on_poll(
-		self: Union["OnPoll", PFilter, Filter, None] = None,
-		client_filters: Union[PFilter, Filter, None] = None,
-		filters: Union[Filter, None] = None,
-		group: int = 0
+class OnEditedBusinessMessage:
+	def on_edited_business_message(
+		self: Optional[Union["OnEditedBusinessMessage", PFilter, Filter]] = None,
+		client_filters: Optional[Union[PFilter, Filter]] = None,
+		filters: Optional[Filter] = None,
+		group: int = 0,
 	) -> Callable:
-		"""Decorator for handling polls.
-  
+		"""Decorator for handling edited messages from business connection.
+
 		This does the same thing as :meth:`~pypoligram.ClientManager.add_handler` using the
-		:obj:`~pyrogram.handlers.PollHandler`.
-  
+		:obj:`~pyrogram.handlers.EditedBusinessMessageHandler`.
+
 		Parameters:
 			client_filters (:obj:`~pypoligram.filters`, *optional*):
 				Pass one or more filters to allow only a subset of clients to be passed
 				in your function.
 
 			filters (:obj:`~pyrogram.filters`, *optional*):
-				Pass one or more filters to allow only a subset of polls to be passed
+				Pass one or more filters to allow only a subset of messages to be passed
 				in your function.
-	
+
 			group (``int``, *optional*):
 				The group identifier, defaults to 0.
+
+		Parameters:
+			client_filters (:obj:`~pypoligram.filters`, *optional*):
+				Pass one or more filters to allow only a subset of clients to be passed
+				in your function.
 		"""
 
 		def decorator(func: Callable) -> Callable:
 			nonlocal self, client_filters, filters, group
 			if isinstance(self, pypoligram.ClientManager):
-				self.add_handler(pyrogram.handlers.PollHandler(func, filters), client_filters or ALL, group)
-			elif isinstance(self, Union[PFilter, Filter]) or self is None:
+				self.add_handler(pyrogram.handlers.EditedBusinessMessageHandler(func, filters), client_filters or ALL, group)
+			elif isinstance(self, Filter) or self is None:
 				if not hasattr(func, "handlers"):
 					func.handlers = []
 				if isinstance(self, PFilter):
@@ -49,7 +54,7 @@ class OnPoll:
 
 				func.handlers.append(
 					(
-						pyrogram.handlers.PollHandler(func, filters),
+						pyrogram.handlers.EditedBusinessMessageHandler(func, filters),
 						client_filters or ALL,
 						group
 					)

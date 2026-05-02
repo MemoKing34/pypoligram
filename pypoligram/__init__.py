@@ -4,4 +4,4 @@ __copyright__ = "Copyright (C) 2023-present, MemoKing34 <https://github.com/Memo
 
 
 from . import filters, sync
-from .clients import ClientManager, idle
+from .clients import ClientManager, idle, compose
