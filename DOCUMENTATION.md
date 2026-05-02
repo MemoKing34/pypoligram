@@ -1,6 +1,6 @@
-# PyPoligram Documentation
+# Pypoligram Documentation
 
-PyPoligram is a Python package designed to manage multiple `pyrogram.Client` instances efficiently. It simplifies the process of handling multiple clients and provides a unified interface for managing pyrogram interactions.
+Pypoligram is a Python package designed to manage multiple `pyrogram.Client` instances efficiently. It simplifies the process of handling multiple clients and provides a unified interface for managing pyrogram interactions.
 
 I tried to make it similar to Pyrogram. These methods have nearly the same usage as Pyrogram. Here, I will explain the differences.
 
@@ -21,7 +21,7 @@ I tried to make it similar to Pyrogram. These methods have nearly the same usage
 
 ## Installation
 
-Install PyPoligram using pip:
+Install pypoligram using pip:
 
 ```bash
 pip install pypoligram
@@ -57,7 +57,7 @@ manager.run()
 
 ### ClientManager
 
-The `ClientManager` class is the central component of PyPoligram. It allows you to manage and run multiple `pyrogram.Client` instances with a unified interface.
+The `ClientManager` class is the central component of pypoligram. It allows you to manage and run multiple `pyrogram.Client` instances with a unified interface.
 
 #### Parameters
 
@@ -128,16 +128,16 @@ The `ClientManager` class is the central component of PyPoligram. It allows you 
 
 * `restart2`: This is also restarts all the clients in the manager. But this fuction calls its own stop and start method instead of using `Client.restart` method. Params are same as `restart`
 
-* `run`: Starts the manager, idles the main script, and stops the manager.
+* `run`: Just like `Client.run`, starts the manager, idles the main script, and stops the manager. 
     Params:
-    * `coroutine`: Coroutine object that will be runned instead of the manager. You can use it like `asyncio.run`. If nothing is given it will start the manager, idle the main script, and stop the manager, as mentioned previously.
+    * `coroutine`: Coroutine object that will be runned instead of the manager. You can use it like `asyncio.run`. If nothing is given it will start the manager, idle the main script, and stop the manager, as mentioned previously. _Optional, default: None_
     * `sequential: bool`: If it is set to True, clients will be started and stopped sequentially instead of concurrently. _Optional, default: False_
 ---
 
 
 ## Filters
 
-Filters in PyPoligram allow you to filter clients based on custom logic. It works similarly to Pyrogram's filter system. However, there are two differences. First, you have to use synchronous functions. Second, these filters run only once when the `ClientManager.add_handler` function runs. If you need to filter dynamically, you can access the manager from its clients via the `_clients` parameter.
+Filters in pypoligram allow you to filter clients based on custom logic. It works similarly to Pyrogram's filter system. However, there are two differences. First, you have to use synchronous functions. Second, these filters run only once when the `ClientManager.add_handler` function runs. If you need to filter dynamically, you can access the manager from its clients via the `_clients` parameter.
 
 ### Built-in Filters
 
@@ -151,7 +151,7 @@ Filters in PyPoligram allow you to filter clients based on custom logic. It work
 ```python
 from pyrogram import Client
 from pyrogram.handlers import MessageHandler
-from pypoligram import ClientManager, filters as pfilters # To avoid confusion, we recommend using PyPoligram's filters as pfilters, even if you are not using Pyrogram's filters.
+from pypoligram import ClientManager, filters as pfilters # To avoid confusion, we recommend using pypoligram's filters as pfilters, even if you are not using Pyrogram's filters.
 
 manager = ClientManager([
     Client("user"),
@@ -188,7 +188,10 @@ MY_FILTER = create(my_filter, "MY_FILTER")
 
 ## Decorators
 
-Similar to pyrogram's, PyPoligram provides decorators that simplify the process of registering handlers for multiple clients.
+Similar to pyrogram's, pypoligram provides decorators that simplify the process of registering handlers for multiple clients.
+
+> [!NOTE]
+> I try to keep these decorators up to date according to [kurigram](https://github.com/KurimuzonAkuma/kurigram) package since pyrogram is depracated. I choose kurigram because its the fork that I use but even if you are using a different fork of pyrogram or original pyrogram its not a problem as long as you don't use a decorator that your pyrogram does not have.
 
 ### Available Decorators
 
@@ -234,7 +237,7 @@ manager.run()
 
 ## Smart Plugins
 
-PyPoligram supports **Smart Plugins**, a powerful plugin system that allows you to modularize handler logic across multiple files and folders. It helps you keep your codebase clean and organized, especially when working with many clients and handlers.
+Pypoligram supports **Smart Plugins**, a powerful plugin system that allows you to modularize handler logic across multiple files and folders. It helps you keep your codebase clean and organized, especially when working with many clients and handlers.
 
 > 💡 **Tip:** Smart Plugins are **optional** and disabled by default. You must explicitly enable them by passing the `plugins` parameter to `ClientManager`.
 
@@ -248,7 +251,7 @@ With Smart Plugins:
 * Handlers are automatically registered across **all clients**.
 
 
-### Folder Structure Example
+**Folder Structure Example**
 
 ```
 myproject/
@@ -340,13 +343,13 @@ Pypoligram should be fine with other pyrogram forks unless they have a different
 
 ### Pyromod
 
-Pypoligram does not work with Pyromod unless you set the `dont_modify` parameter to `True` in `ClientManager`. This is because Pypoligram, by default, replaces `pyrogram.Client`'s dispatcher class with its own in order to pass the `ClientManager` client as a parameter to handler functions. 
+Pypoligram does not work with Pyromod unless you set the `dont_modify` parameter to `True` in `ClientManager`. This is because pypoligram, by default, replaces `pyrogram.Client`'s dispatcher class with its own in order to pass the `ClientManager` client as a parameter to handler functions. 
 
 On the other hand, Pyromod modifies the handlers to catch messages, and assumes (understandably) that handlers receive two parameters. However, when you change the dispatcher, handlers receive three parameters, which causes a conflict.
 
 Currently, I am working on a [fork of Pyromod](https://github.com/MemoKing34/pyromod) that avoids modifying the handlers. Instead, it modifies the dispatcher. I believe this approach will be faster and more compatible with Pyrogram.
 
-In addition to that, I plan to add support for [my own fork](https://github.com/MemoKing34/pyromod), since my implementation also modifies the dispatcher class.
+In addition to that, I plan to add support for [my own fork of pyromod](https://github.com/MemoKing34/pyromod), since my implementation also modifies the dispatcher class.
 
 For now, If you want to use pyromod, create you manager like this:
 ```python
@@ -357,11 +360,27 @@ manager = ClientManager(..., dont_modify=True)
 
 At the moment, I am not aware of any other fork, module, or plugin for **Pyrogram** that has been tested with **Pypoligram**. I cannot guarantee compatibility with any of them.
 
-If you know of a fork, module, or plugin that works with Pypoligram — or if you maintain one — feel free to let me know. I’ll be happy to test it, and if it doesn’t work, I’ll try to add support for it or include it in a compatibility list.
+If you know of a fork, module, or plugin that works with pypoligram — or if you maintain one — feel free to let me know. I’ll be happy to test it, and if it doesn’t work, I’ll try to add support for it or include it in a compatibility list.
 
 ---
 
 ## Examples
+
+### Basic Usage
+
+```python
+from pyrogram import Client
+from pypoligram import ClientManager
+
+manager = ClientManager()
+manager.add_client(Client("my_account"))
+
+@ClientManager.on_message()
+async def handle_message(manager, client, message):
+    print(f"Received message: {message.text}")
+
+manager.run()
+```
 
 ### Registering Handlers
 
@@ -380,4 +399,25 @@ manager = ClientManager([
 
 manager.add_handler(MessageHandler(hello), pfilters.client("my_account1"))
 manager.run()
+```
+
+### Using with `pyrogram.compose`
+
+Since you can iterate over `ClientManager` you can use it with `pyrogram.compose` function
+
+```python
+from pyrogram import Client, compose
+from pypoligram import ClientManager
+
+async def hello(client, message):
+    print(message)
+
+manager = ClientManager([
+    Client("my_account1"),
+    Client("my_account2"),
+])
+
+# Add your methods...
+
+compose(manager)
 ```

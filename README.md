@@ -1,5 +1,5 @@
-# PyPoligram
-PyPoligram is a Python package designed to manage multiple `pyrogram.Client` instances efficiently. It simplifies the process of handling multiple clients.
+# Pypoligram
+Pypoligram is a Python package designed to manage multiple `pyrogram.Client` instances efficiently. It simplifies the process of handling multiple clients.
 
 ## Features
 
@@ -12,7 +12,7 @@ PyPoligram is a Python package designed to manage multiple `pyrogram.Client` ins
 
 ## Installation
 
-Install PyPoligram using pip:
+Install pypoligram using pip:
 
 ```bash
 pip install pypoligram

@@ -617,7 +617,7 @@ class ClientManager(Decorators):
 		It makes running a single client less verbose.
   
 		In case a coroutine is passed, runs the coroutine until it's completed and doesn't do any client
-        operation. This is almost the same as :py:obj:`asyncio.run` except for the fact that PyPoligram's ``run`` uses the
+        operation. This is almost the same as :py:obj:`asyncio.run` except for the fact that pypoligram's ``run`` uses the
         current event loop instead of a new one.
         
 		Parameters:
