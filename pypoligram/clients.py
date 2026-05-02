@@ -43,13 +43,13 @@ class ClientManager(Decorators):
    			Defaults to ``None``.
 	
 		dont_modify (``bool``, *optional*):
-			If set to ``True``, the clients will not be modified. That means handler functions will not be
-			get a manager argument and the dispatcher will not be replaced.
+			If set to ``True``, the clients will not be modified. That means handler functions will not
+			receive the manager argument and the dispatcher will not be replaced.
 			You can use this option to add a client to the manager and then use it as a normal client.
    			Defaults to ``False``.
 	
 		kwargs (``dict``, *optional*):
-			A dictionary with the kwargs to be passed to the all clients. If client has a different value for the
+			A dictionary with the kwargs to be passed to all clients. If client has a different value for the
 			argument, it will be ignored. You can use this option to set the same value for all clients.
    			Defaults to ``None``.
 	"""
@@ -118,7 +118,7 @@ class ClientManager(Decorators):
 		"""Remove a client from the manager.
 
 		You have to give the exact same client instance you added to the manager to remove it. You can use the return 
-		value of :metm:`~pypoligram.ClientManager.add_client` method, the client itself, and pass it directly. If the 
+		value of :meth:`~pypoligram.ClientManager.add_client` method, the client itself, and pass it directly. If the 
 		client was not added to the manager, it will be ignored.
   
 		Parameters:
@@ -451,7 +451,7 @@ class ClientManager(Decorators):
 				Defaults to False.
 	
 			block (``bool``, *optional*):
-				Blocks the code execution until all the clients has been stopped. It is useful with ``block=False`` in
+				Blocks the code execution until all the clients have been stopped. It is useful with ``block=False`` in
 				case you want to stop the own client *within* a handler in order not to cause a deadlock. 
 				Defaults to True.
     

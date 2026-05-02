@@ -94,7 +94,7 @@ The `ClientManager` class is the central component of pypoligram. It allows you 
 * `add_client`: Adds a client to the manager. 
     Params:
     * `client: Client`: The client that will be added to the manager.
-    * `dont_add_kwargs: bool`: If it sets to True `ClientManager.kwargs` values wont pass the client. _Optional, default: False_. 
+    * `dont_add_kwargs: bool`: If it is set to True `ClientManager.kwargs` values won't pass the client. _Optional, default: False_. 
 
 * `discard_client`: Removes a client from the manager.
     Params:
@@ -103,7 +103,7 @@ The `ClientManager` class is the central component of pypoligram. It allows you 
 
 * `add_handler(filters, handler, group=0)`: Registers an update handler to multiple clients.
     Params:
-    * `handler: pyrogram.handlers.Handler`: The handler that will be registired.
+    * `handler: pyrogram.handlers.Handler`: The handler that will be registered.
     * `filters: pypoligram.Filter`: The filter to filter the clients that will receive the handler. _Optional, default: `pypoligram.filters.ALL`_
     * `group: int`: The group identifier. _Optional, default: 0_.
 
@@ -119,18 +119,18 @@ The `ClientManager` class is the central component of pypoligram. It allows you 
 * `stop`: Stops all clients in the manager.
     Params:
     * `sequential: bool`: If it is set to True, clients will be stopped sequentially instead of concurrently. _Optional, default: False_
-    * `block: bool`: Blocks the code execution until all the clients has been stopped. It is useful with ``block=False`` in case you want to stop the own client **within** a handler in order not to cause a deadlock. _Optional, default: True_
+    * `block: bool`: Blocks the code execution until all the clients have been stopped. It is useful with ``block=False`` in case you want to stop the own client **within** a handler in order not to cause a deadlock. _Optional, default: True_
 
 * `restart`: Restarts all clients in the manager. To do this, it will call the `Client.restart` method for each client.
     Params:
     * `sequential: bool`: If it is set to True, clients will be restarted sequentially instead of concurrently. _Optional, default: False_
-    * `block: bool`: Blocks the code execution until all the clients has been restarted. It is useful with ``block=False`` in case you want to restart the own client **within** a handler in order not to cause a deadlock. _Optional, default: True_
+    * `block: bool`: Blocks the code execution until all the clients have been restarted. It is useful with ``block=False`` in case you want to restart the own client **within** a handler in order not to cause a deadlock. _Optional, default: True_
 
-* `restart2`: This is also restarts all the clients in the manager. But this fuction calls its own stop and start method instead of using `Client.restart` method. Params are same as `restart`
+* `restart2`: This also restarts all the clients in the manager. But this function calls its own stop and start methods instead of using `Client.restart` method. Parameters are the same as `restart`
 
 * `run`: Just like `Client.run`, starts the manager, idles the main script, and stops the manager. 
     Params:
-    * `coroutine`: Coroutine object that will be runned instead of the manager. You can use it like `asyncio.run`. If nothing is given it will start the manager, idle the main script, and stop the manager, as mentioned previously. _Optional, default: None_
+    * `coroutine`: Coroutine object that will be run instead of the manager. You can use it like `asyncio.run`. If nothing is given it will start the manager, idle the main script, and stop the manager, as mentioned previously. _Optional, default: None_
     * `sequential: bool`: If it is set to True, clients will be started and stopped sequentially instead of concurrently. _Optional, default: False_
 ---
 
@@ -191,7 +191,7 @@ MY_FILTER = create(my_filter, "MY_FILTER")
 Similar to pyrogram's, pypoligram provides decorators that simplify the process of registering handlers for multiple clients.
 
 > [!NOTE]
-> I try to keep these decorators up to date according to [kurigram](https://github.com/KurimuzonAkuma/kurigram) package since pyrogram is depracated. I choose kurigram because its the fork that I use but even if you are using a different fork of pyrogram or original pyrogram its not a problem as long as you don't use a decorator that your pyrogram does not have.
+> I try to keep these decorators up to date according to [kurigram](https://github.com/KurimuzonAkuma/kurigram) package since pyrogram is deprecated. I chose kurigram because it's the fork that I use, but even if you are using a different fork of pyrogram or the original pyrogram, it's not a problem as long as you don't use a decorator that your pyrogram does not have.
 
 ### Available Decorators
 
@@ -351,7 +351,7 @@ Currently, I am working on a [fork of Pyromod](https://github.com/MemoKing34/pyr
 
 In addition to that, I plan to add support for [my own fork of pyromod](https://github.com/MemoKing34/pyromod), since my implementation also modifies the dispatcher class.
 
-For now, If you want to use pyromod, create you manager like this:
+For now, if you want to use pyromod, create your manager like this:
 ```python
 manager = ClientManager(..., dont_modify=True)
 ```
@@ -403,7 +403,7 @@ manager.run()
 
 ### Using with `pyrogram.compose`
 
-Since you can iterate over `ClientManager` you can use it with `pyrogram.compose` function
+Since you can iterate over `ClientManager` you can use it with `pyrogram.compose` function. But `pyrogram.compose` doesn't run `ClientManager`'s `start` method. It iterates over `ClientManager` and starts every `Client` individually. If you implemented your own class by inheriting `ClientManager` keep this in your mind.
 
 ```python
 from pyrogram import Client, compose
