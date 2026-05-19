@@ -1,7 +1,6 @@
 from typing import Callable, Optional, Union
 
 import pyrogram
-from pyrogram.filters import Filter, create
 
 import pypoligram
 
@@ -56,7 +55,7 @@ class OrFilter(Filter):
 CUSTOM_FILTER_NAME = "CustomFilter"
 
 
-def create(func: Callable, name: str = None, **kwargs) -> Filter:
+def create(func: Callable, name: Optional[str] = None, **kwargs) -> Filter:
 	"""Easy way to create a custom filter
  
 	Custom filters give you extra flexibility to filter clients based on your own logic.

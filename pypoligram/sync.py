@@ -1,7 +1,7 @@
 import inspect
 
 try:
-	from pyrogram.sync import async_to_sync  #type: ignore
+	from pyrogram.sync import async_to_sync
 except ImportError:
 	def async_to_sync(source, name):
 		"""if we can't import it, we will just pass it.

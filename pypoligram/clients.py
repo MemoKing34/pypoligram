@@ -1,11 +1,13 @@
 import asyncio
 import inspect
 import logging
-from collections.abc import Iterable
+import sys
+from collections.abc import Iterable, Iterator
 from concurrent.futures.thread import ThreadPoolExecutor
 from importlib import import_module
 from pathlib import Path
-import sys
+from typing import Optional
+
 if sys.version_info >= (3, 11):
     from typing import Self
 else:
@@ -56,11 +58,11 @@ class ClientManager(Decorators):
 
 	def __init__(
      	self,
-      	clients: Iterable[Client] = None, *,
+      	clients: Optional[Iterable[Client]] = None, *,
        	name: str = "Clients",
-		plugins: dict = None,
+		plugins: Optional[dict] = None,
   		dont_modify: bool = False,
-		kwargs: ClientArgTypes = None
+		kwargs: Optional[ClientArgTypes] = None
   	):
 		if kwargs is None:
 			kwargs = {}
@@ -105,7 +107,7 @@ class ClientManager(Decorators):
 		if not self.dont_modify:
 			client.dispatcher = PDispatcher(client, self)
 		client.plugins = None if self.plugins else client.plugins
-		client._clients = self
+		client._clients = self # type: ignore
 		if not dont_add_kwargs:
 			if self._kwargs:
 				for name, value in self._kwargs.items():
@@ -360,11 +362,11 @@ class ClientManager(Decorators):
 				log.warning('[%s] No plugin loaded from "%s"', self.name, root)
 
 	def __iter__(self) -> Self:
-		self.__iter: Iterable[Client] = iter(self._clients)
+		self.__iter: Iterator[Client] = iter(self._clients)
 		return self
 
 	async def __aiter__(self) -> Self:
-		self.__aiter: Iterable[Client] = iter(self._clients)
+		self.__aiter: Iterator[Client] = iter(self._clients)
 		return self
 
 	def __next__(self) -> Client:
@@ -674,6 +676,6 @@ class ClientManager(Decorators):
 			run(idle())
 			run(self.stop(sequential=sequential))
 		else:
-			self.start(sequential)
+			self.start(sequential) # type: ignore
 			run(idle())
-			self.stop(sequential=sequential)
+			self.stop(sequential=sequential) # type: ignore

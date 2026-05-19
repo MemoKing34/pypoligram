@@ -55,6 +55,6 @@ class ClientArgTypes(TypedDict, total=False):
 __fullargspec = inspect.getfullargspec(Client)
 if __fullargspec.defaults is None:
     # pyromod patched the client and we cannot access it
-    __fullargspec = inspect.getfullargspec(Client.old__init__)
-__diff: int = len(__fullargspec.args) - len(__fullargspec.defaults)
-default_args: ClientArgTypes = {arg[0]: arg[1] for arg in zip(__fullargspec.args[__diff:], __fullargspec.defaults)}
+    __fullargspec = inspect.getfullargspec(Client.old__init__) # type: ignore
+__diff: int = len(__fullargspec.args) - len(__fullargspec.defaults) # type: ignore
+default_args: ClientArgTypes = {key: value for key, value in zip(__fullargspec.args[__diff:], __fullargspec.defaults)} # type: ignore

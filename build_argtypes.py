@@ -1,6 +1,6 @@
-from pathlib import Path
-import re
 import builtins
+import re
+from pathlib import Path
 
 client_path = Path(".venv") / 'lib' / 'python3.14' / 'site-packages' / 'pyrogram' / 'client.py'
 argtypes_path = Path("pypoligram") / 'arg_types.py'
