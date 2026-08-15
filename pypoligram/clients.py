@@ -2,11 +2,10 @@ import asyncio
 import inspect
 import logging
 import sys
-from collections.abc import Iterable, Iterator
 from concurrent.futures.thread import ThreadPoolExecutor
 from importlib import import_module
 from pathlib import Path
-from typing import Optional
+from typing import Dict, Iterable, Iterator, Optional, Tuple
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -28,28 +27,28 @@ log = logging.getLogger(__name__)
 
 class ClientManager(Decorators):
 	"""Pypoligram's Client Manager, the main class to manage multiple clients.
- 
+
 	Parameters:
 		clients (``iterable``, *optional*):
 			An iterable of :obj:`pyrogram.Client` instances to be added to the manager.
 			You can pass a list, tuple, set, any other iterable or nothing at all.
 			Defaults to ``None``.
-	
+
 		name (``str``, *optional*):
 			The name of the manager. Defaults to ``"Clients"``.
-	
+
 		plugins (``dict``, *optional*):
 			Smart Plugins settings as dict, e.g.: *dict(root="plugins")*.
 			This plugin has some extra settings from normal pyrogram plugin settings in ordor to apply
 			all the clients. For more information, please refer to the documentation.
    			Defaults to ``None``.
-	
+
 		dont_modify (``bool``, *optional*):
 			If set to ``True``, the clients will not be modified. That means handler functions will not
 			receive the manager argument and the dispatcher will not be replaced.
 			You can use this option to add a client to the manager and then use it as a normal client.
    			Defaults to ``False``.
-	
+
 		kwargs (``dict``, *optional*):
 			A dictionary with the kwargs to be passed to all clients. If client has a different value for the
 			argument, it will be ignored. You can use this option to set the same value for all clients.
@@ -60,7 +59,7 @@ class ClientManager(Decorators):
      	self,
       	clients: Optional[Iterable[Client]] = None, *,
        	name: str = "Clients",
-		plugins: Optional[dict] = None,
+		plugins: Optional[Dict] = None,
   		dont_modify: bool = False,
 		kwargs: Optional[ClientArgTypes] = None
   	):
@@ -78,28 +77,28 @@ class ClientManager(Decorators):
 
 	def add_client(self, client: Client, dont_add_kwargs: bool = False) -> Client:
 		"""Add a client to the manager.
-  
+
 		Parameters:
 			client (:obj:`pyrogram.Client`):
 				The client to be added.
-	
+
 			dont_add_kwargs (``bool``, *optional*):
 				Whether to add the kwargs to the client or not. Defaults to False.
-    
+
 		Returns:
 			:obj:`~pyrogram.Client`: The added client itself.
-   
+
 		Example:
 			.. code-block:: python
-	
+
 				from pyrogram import Client
 				from pypoligram import ClientManager
-	
+
 				manager = ClientManager()
-	
+
 				client1 = Client("my_account1")
 				client2 = Client("my_account2")
-	
+
 				manager.add_client(client1)
 				manager.add_client(client2)
 		"""
@@ -119,31 +118,31 @@ class ClientManager(Decorators):
 	def discard_client(self, client: Client) -> Client:
 		"""Remove a client from the manager.
 
-		You have to give the exact same client instance you added to the manager to remove it. You can use the return 
-		value of :meth:`~pypoligram.ClientManager.add_client` method, the client itself, and pass it directly. If the 
+		You have to give the exact same client instance you added to the manager to remove it. You can use the return
+		value of :meth:`~pypoligram.ClientManager.add_client` method, the client itself, and pass it directly. If the
 		client was not added to the manager, it will be ignored.
-  
+
 		Parameters:
 			client (:obj:`pyrogram.Client`):
 				The client to be removed.
-    
+
 		Returns:
 			:obj:`~pyrogram.Client`: The removed client itself.
-   
+
 		Example:
 			.. code-block:: python
-	
+
 				from pyrogram import Client
 				from pypoligram import ClientManager
-	
+
 				manager = ClientManager()
-	
+
 				client1 = Client("my_account1")
 				client2 = Client("my_account2")
-	
+
 				manager.add_client(client1)
 				manager.add_client(client2)
-	
+
 				manager.discard_client(client1)
 		"""
 		if not self.dont_modify:
@@ -155,42 +154,42 @@ class ClientManager(Decorators):
 			pass
 		return client
 
-	def add_handler(self, handler: Handler, filters: PFilter = pALL, group: int = 0, **kwargs) -> tuple[Handler, int]:
+	def add_handler(self, handler: Handler, filters: PFilter = pALL, group: int = 0, **kwargs) -> Tuple[Handler, int]:
 		"""Register an update handler to multiple clients.
-  
+
 		You can use it just like :meth:`pyrogram.Client.add_handler` but it will register the handler to all clients in
   		the manager that pass :obj:`pypoligram.filters`.
-    
+
 		Parameters:
 			handler (``Handler``):
 				The handler to be registered.
-	
+
 			filters (:obj:`pypoligram.filters`, *optional*):
 				The filter to filter the clients that will receive the handler, defaults to :obj:`pypoligram.filters.ALL`
-	
+
 			group (``int``, *optional*):
 				The group identifier, defaults to 0.
-    
+
 		Returns:
 			``tuple``: A tuple consisting of *(handler, group)*.
-   
+
 		Example:
 			.. code-block:: python
-	
+
 				from pyrogram import Client
 				from pyrogram.handlers import MessageHandler
 				from pypoligram import ClientManager, filters as pfilters
-	
+
 				async def hello(client, message):
 					print(message)
-	
+
 				manager = ClientManager([
 					Client("my_account1"),
 					Client("my_account2"),
 				])
-	
+
 				manager.add_handler(MessageHandler(hello), pfilters.client("my_account1"), group=1)
-	
+
 				manager.run()
 		"""
 		names = []
@@ -205,37 +204,37 @@ class ClientManager(Decorators):
 
 	def remove_handler(self, handler: Handler, group: int = 0, **kwargs) -> None:
 		"""Remove a previously-registered update handler from multiple clients.
-  
+
 		Make sure to provide the right group where the handler was added in. You can use the return value of the
 		:meth:`~pyrogram.Client.add_handler` method, a tuple of *(handler, group)*, and pass it directly.
-  
+
 		Parameters:
 			handler (``Handler``):
 				The handler to be removed.
-  
+
 			group (``int``, *optional*):
 				The group identifier, defaults to 0.
-    
+
 		Example:
 			.. code-block:: python
-	
+
 				from pyrogram import Client
 				from pyrogram.handlers import MessageHandler
 				from pypoligram import ClientManager
-	
+
 				async def hello(client, message):
 					print(message)
-	
+
 				manager = ClientManager([
 					Client("my_account1"),
 					Client("my_account2"),
 				])
-	
+
 				handler = manager.add_handler(MessageHandler(hello), pfilters.client("my_account1"))
-	
+
 				# Starred expression to unpack (handler, group)
 				manager.remove_handler(*handler)
-	
+
 				manager.run()
 		"""
 		names = []
@@ -309,9 +308,9 @@ class ClientManager(Decorators):
 					for name in handlers:
 						# noinspection PyBroadException
 						try:
-							for filters, handler, group in getattr(module, name).handlers:
+							for handler, filters, group in getattr(module, name).handlers:
 								if isinstance(handler, Handler) and isinstance(group, int):
-									self.add_handler(filters, handler, group, name=name, module_path=module_path)
+									self.add_handler(handler, filters, group, name=name, module_path=module_path)
 
 									# log.info('[{}] [MULTILOAD] {}("{}") in group {} from "{}"'.format(
 									#	self.name, type(handler).__name__, name, group, module_path))
@@ -345,7 +344,7 @@ class ClientManager(Decorators):
 						try:
 							for filters, handler, group in getattr(module, name).handlers:
 								if isinstance(handler, Handler) and isinstance(group, int):
-									self.remove_handler(filters, handler, group, name=name, module_path=module_path)
+									self.remove_handler(handler, group, name=name, module_path=module_path)
 
 									# log.info('[{}] [MULTIUNLOAD] {}("{}") from group {} in "{}"'.format(
 									#	self.name, type(handler).__name__, name, group, module_path))
@@ -398,40 +397,40 @@ class ClientManager(Decorators):
 
 	async def start(self, sequential: bool = False) -> Self:
 		"""Start all clients in the manager.
-		
+
   		You can use it just like :meth:`pyrogram.Client.start` but it will start all clients in the manager.
-    
+
 		Parameters:
 			sequential (``bool``, *optional*):
 				Start the clients sequentially instead of concurrently.
 				Defaults to False.
-    
+
 		Returns:
 			:obj:`~pypoligram.ClientManager`: The started manager itself.
-   
+
 		Raises:
 			ConnectionError: In case you try to start an already started client.
-   
+
 		Example:
 			.. code-block:: python
-   
+
 				import asyncio
-	
+
 				from pyrogram import Client
 				from pypoligram import ClientManager
-	
+
 				manager = ClientManager([
 					Client("account1"),
 					Client("account2"),
 					Client("account3")
 				])
 
-	
+
 				async def main():
 					await manager.start()
 					... # Invoke API methods
 					await manager.stop()
-	
+
 				asyncio.run(main())
 		"""
 		self.load_plugins()
@@ -444,44 +443,44 @@ class ClientManager(Decorators):
 
 	async def stop(self, sequential: bool = False, block: bool = True) -> Self:
 		"""Stop all clients in the manager.
-		
+
   		You can use it just like :meth:`pyrogram.Client.stop` but it will stop all clients in the manager.
-    
+
 		Parameters:
 			sequential (``bool``, *optional*):
 				Stop the clients sequentially instead of concurrently.
 				Defaults to False.
-	
+
 			block (``bool``, *optional*):
 				Blocks the code execution until all the clients have been stopped. It is useful with ``block=False`` in
-				case you want to stop the own client *within* a handler in order not to cause a deadlock. 
+				case you want to stop the own client *within* a handler in order not to cause a deadlock.
 				Defaults to True.
-    
+
 		Returns:
 			:obj:`~pypoligram.ClientManager`: The stopped manager itself.
-   
+
 		Raises:
 			ConnectionError: In case you try to stop an already stopped client.
-   
+
 		Example:
 			.. code-block:: python
-	
+
 				import asyncio
-	
+
 				from pyrogram import Client
 				from pypoligram import ClientManager
-	
+
 				manager = ClientManager([
 					Client("account1"),
 					Client("account2"),
 					Client("account3")
 				])
-	
+
 				async def main():
 					await manager.start()
 					... # Invoke API methods
 					await manager.stop()
-     
+
 				asyncio.run(main())
 		"""
 		async def do_it():
@@ -499,46 +498,46 @@ class ClientManager(Decorators):
 
 	async def restart(self, sequential: bool = False, block: bool = True) -> Self:
 		"""Restart all clients in the manager.
-		
+
   		This method calls :meth:`pyrogram.Client.restart` for every client in the manager.
-    
+
 		Parameters:
 			sequential (``bool``, *optional*):
 				Restart the clients sequentially instead of concurrently.
 				Defaults to False.
-    
+
 			block (``bool``, *optional*):
 				Blocks the code execution until all the clients has been restarted. It is useful with ``block=False`` in
-				case you want to restart the own client *within* a handler in order not to cause a deadlock. 
+				case you want to restart the own client *within* a handler in order not to cause a deadlock.
 				Defaults to True.
-    
+
 		Returns:
 			:obj:`~pypoligram.ClientManager`: The restarted manager itself.
-   
+
 		Raises:
 			ConnectionError: In case you try to restart a stopped client.
-   
+
 		Example:
 			.. code-block:: python
-	
+
 				import asyncio
-	
+
 				from pyrogram import Client
 				from pypoligram import ClientManager
-	
+
 				manager = ClientManager([
 					Client("account1"),
 					Client("account2"),
 					Client("account3")
 				])
-	
+
 				async def main():
 					await manager.start()
 					... # Invoke API methods
 					await manager.restart()
 					... # Invoke other API methods
 					await manager.stop()
-     
+
 				asyncio.run(main())
 		"""
 		async def do_it():
@@ -557,47 +556,47 @@ class ClientManager(Decorators):
 
 	async def restart2(self, sequential: bool = False, block: bool = True) -> Self:
 		"""Restart all clients in the manager.
-		
+
   		This method will call :meth:`pypoligram.ClientManager.stop` and then :meth:`pypoligram.ClientManager.start` in a row instead of
 		calling :meth:`pyrogram.Client.restart` for every client in the manager.
-  
+
 		Parameters:
 			sequential (``bool``, *optional*):
 				Restart the clients sequentially instead of concurrently.
 				Defaults to False.
-	
+
 			block (``bool``, *optional*):
 				Blocks the code execution until all the clients has been restarted. It is useful with ``block=False`` in
-				case you want to restart the own client *within* a handler in order not to cause a deadlock. 
+				case you want to restart the own client *within* a handler in order not to cause a deadlock.
 				Defaults to True.
-    
+
 		Returns:
 			:obj:`~pypoligram.ClientManager`: The restarted manager itself.
-   
+
 		Raises:
 			ConnectionError: In case you try to restart a stopped client.
-   
+
 		Example:
 			.. code-block:: python
-	
+
 				import asyncio
-	
+
 				from pyrogram import Client
 				from pypoligram import ClientManager
-	
+
 				manager = ClientManager([
 					Client("account1"),
 					Client("account2"),
 					Client("account3")
 				])
-	
+
 				async def main():
 					await manager.start()
 					... # Invoke API methods
 					await manager.restart()
 					... # Invoke other API methods
 					await manager.stop()
-     
+
 				asyncio.run(main())
 		"""
 		async def do_it():
@@ -613,32 +612,32 @@ class ClientManager(Decorators):
 
 	def run(self, coroutine=None, /, *, sequential: bool = False) -> None:
 		"""Start the manager, idle the main script and finally stop the manager.
-  
+
 		When calling this method without any argument it acts as a convenience method that calls
 		:meth:`~pypoligram.ClientManager.start`, :meth:`~pyrogram.idle` and :meth:`~pypoligram.ClientManager.stop` in sequence.
 		It makes running a single client less verbose.
-  
+
 		In case a coroutine is passed, runs the coroutine until it's completed and doesn't do any client
         operation. This is almost the same as :py:obj:`asyncio.run` except for the fact that pypoligram's ``run`` uses the
         current event loop instead of a new one.
-        
+
 		Parameters:
 			coroutine (``coroutine``, *optional*):
 				The coroutine to run. If not provided, the manager will be started and idled.
-	
+
 			sequential (``bool``, *optional*):
 				Start the clients sequentially instead of concurrently.
 				Defaults to False.
-    
+
 		Raises:
 			ConnectionError: In case you try to run an already started client.
-   
+
 		Example:
 			.. code-block:: python
-	
+
 				from pyrogram import Client
 				from pypoligram import ClientManager
-	
+
 				manager = ClientManager([
 					Client("account1"),
 					Client("account2"),
@@ -646,23 +645,23 @@ class ClientManager(Decorators):
 				])
 				... # Set handlers up
 				manager.run()
-	
+
 			.. code-block:: python
-	
+
 				from pyrogram import Client
 				from pypoligram import ClientManager
-				
+
 				manager = ClientManager([
 					Client("account1"),
 					Client("account2"),
 					Client("account3")
 				])
-    
+
 				async def main():
 					async with manager:
 						... # Do something with the clients
-      
-      
+
+
 				manager.run(main())
 		"""
 		loop = asyncio.get_event_loop()

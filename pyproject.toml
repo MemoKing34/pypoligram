@@ -11,7 +11,7 @@ license = { file = "COPYING" }
 authors = [
   { name = "MemoKing34", email = "karam24@itu.edu.tr" }
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.8"
 dependencies = [
   "typing-extensions; python_version < \"3.11\""
 ]
@@ -23,7 +23,7 @@ dev = [
 ]
 
 [tool.hatch.version]
-path = "pypoligram/__init__.py" 
+path = "pypoligram/__init__.py"
 
 [project.urls]
 Homepage = "https://github.com/MemoKing34/pypoligram"

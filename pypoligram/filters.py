@@ -1,4 +1,4 @@
-from typing import Callable, Optional, Union
+from typing import Callable, Optional, Union, List
 
 import pyrogram
 
@@ -57,21 +57,21 @@ CUSTOM_FILTER_NAME = "CustomFilter"
 
 def create(func: Callable, name: Optional[str] = None, **kwargs) -> Filter:
 	"""Easy way to create a custom filter
- 
+
 	Custom filters give you extra flexibility to filter clients based on your own logic.
- 
-	Parameters:	
+
+	Parameters:
 		func (``Callable``):
 			A function that takes three positional arguments *(filter, manager, client)* and returns a boolean: True if the
 			client should be registered the handler, False otherwise.
 			The *filter* argument refers to filter itself and can be used to access keyword arguments (read below).
 			The *manager* argument refers to the :obj:`pypoligram.ClientManager` and can be used to access the clients.
 			The *client* argument refers to the :obj:`pyrogram.Client` and can be used to access the client.
-   
+
 		name (``str``, *optional*):
 			The name of the filter. If not provided, the name of the function will be used.
 			Defaults to "CustomFilter".
-   
+
 		**kwargs (``dict``, *optional*):
 			Any additional keyword arguments that you want to pass to the filter.
 			These will be available in the *filter* argument of the function.
@@ -121,13 +121,13 @@ This filter detects if the client is a bot or not by checking the *bot_token* at
 # region client_filter
 class client(Filter, set):
 	"""Filter clients by its *name* attribute.
- 
+
 	Parameters:
 		clients (``str`` | ``list``):
 			A string or a list of strings containing the names of the clients to filter.
    	"""
 
-	def __init__(self, clients: Union[str, list[str]]):
+	def __init__(self, clients: Union[str, List[str]]):
 		clients = [] if clients is None else clients if isinstance(clients, list) else [clients]
 		super().__init__(clients)
 
