@@ -25,6 +25,16 @@ dev = [
 [tool.hatch.version]
 path = "pypoligram/__init__.py"
 
+[tool.tox]
+env_list = ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
+
+[tool.tox.env_run_base]
+description = "run the test suite"
+deps = ["kurigram"]
+commands = [
+    ["python", "-c", "import pypoligram; print(pypoligram.__version__)"],
+]
+
 [project.urls]
 Homepage = "https://github.com/MemoKing34/pypoligram"
 Repository = "https://github.com/MemoKing34/pypoligram"
