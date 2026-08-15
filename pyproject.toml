@@ -19,7 +19,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "kurigram>=2.2.1",
-  "hatch>=1.15.1",
+  "hatch>=1.14.2",
 ]
 
 [tool.hatch.version]
