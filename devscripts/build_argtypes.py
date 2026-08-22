@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import builtins
 import re
+import sys
 from pathlib import Path
 
-client_path = Path(".venv") / 'lib' / 'python3.14' / 'site-packages' / 'pyrogram' / 'client.py'
+client_path = Path(".venv") / 'lib' / f'python3.{sys.version_info.minor}' / 'site-packages' / 'pyrogram' / 'client.py'
 argtypes_path = Path("pypoligram") / 'arg_types.py'
 
-FILE_TEMPLATE = """import asyncio
+FILE_TEMPLATE = """from __future__ import annotations
+
+import asyncio
 import inspect
 from pathlib import Path
-from typing import Optional, Type, TypedDict, Union
+from typing import Dict, Optional, Type, TypedDict, Union
 
 from pyrogram import Client, enums, raw
 from pyrogram.connection import Connection
@@ -29,8 +34,8 @@ __diff: int = len(__fullargspec.args) - len(__fullargspec.defaults)
 {1}
 """
 
-EOF_ = "default_args: ClientArgTypes = {arg[0]: arg[1] for arg in zip(__fullargspec.args[__diff:], __fullargspec.defaults)}"
-ARG_TEMPLATE = "\t{0}: {1}\n"
+EOF_ = "default_args: ClientArgTypes = {key: value for key, value in zip(__fullargspec.args[__diff:], __fullargspec.defaults)}"
+ARG_TEMPLATE = "\t{0}: {1}\n".expandtabs(4)
 
 builtins_list = dir(builtins)
 
@@ -79,7 +84,7 @@ with argtypes_path.open('r+') as afile:
 lines = []
 for key in client_type_dict:
     #print(f"{key=}\n{client_type_dict[key]=}\n{argtypes_dict.get(key)=}")
-    lines.append(ARG_TEMPLATE.format(key, client_type_dict[key]))
+    lines.append(ARG_TEMPLATE.format(key, client_type_dict[key].replace('dict', 'Dict')))
 
 
 output = FILE_TEMPLATE.format(''.join(lines), EOF_)

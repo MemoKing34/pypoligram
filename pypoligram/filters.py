@@ -1,4 +1,10 @@
-from typing import Callable, Optional, Union, List
+import sys
+from typing import Callable, List, Optional, Union
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 import pyrogram
 
@@ -6,47 +12,47 @@ import pypoligram
 
 
 class Filter:
-	def __call__(self, clients: "pypoligram.ClientManager", client: "pyrogram.Client"):
+	def __call__(self, clients: "pypoligram.ClientManager", client: "pyrogram.Client") -> bool:
 		raise NotImplementedError
 
 	def __invert__(self):
 		return InvertFilter(self)
 
-	def __and__(self, other):
+	def __and__(self, other: Self):
 		return AndFilter(self, other)
 
-	def __or__(self, other):
+	def __or__(self, other: Self):
 		return OrFilter(self, other)
 
-	def check(self, clients: "pypoligram.ClientManager", client: "pyrogram.Client"):
+	def check(self, clients: "pypoligram.ClientManager", client: "pyrogram.Client") -> bool:
 		return self(clients, client)
 
 
 class InvertFilter(Filter):
-	def __init__(self, base):
+	def __init__(self, base: Filter):
 		self.base = base
 
-	def __call__(self, clients: "pypoligram.ClientManager", client: "pyrogram.Client"):
+	def __call__(self, clients: "pypoligram.ClientManager", client: "pyrogram.Client") -> bool:
 		return not self.base(clients, client)
 
 
 class AndFilter(Filter):
-	def __init__(self, base, other):
+	def __init__(self, base: Filter, other: Filter):
 		self.base = base
 		self.other = other
 
-	def __call__(self, clients: "pypoligram.ClientManager", client: "pyrogram.Client"):
+	def __call__(self, clients: "pypoligram.ClientManager", client: "pyrogram.Client") -> bool:
 		if not self.base(clients, client):
 			return False
 		return self.other(clients, client)
 
 
 class OrFilter(Filter):
-	def __init__(self, base, other):
+	def __init__(self, base: Filter, other: Filter):
 		self.base = base
 		self.other = other
 
-	def __call__(self, clients: "pypoligram.ClientManager", client: "pyrogram.Client"):
+	def __call__(self, clients: "pypoligram.ClientManager", client: "pyrogram.Client") -> bool:
 		if self.base(clients, client):
 			return True
 		return self.other(clients, client)
@@ -131,7 +137,7 @@ class client(Filter, set):
 		clients = [] if clients is None else clients if isinstance(clients, list) else [clients]
 		super().__init__(clients)
 
-	def __call__(self, _, client: "pyrogram.Client"):
+	def __call__(self, _, client: "pyrogram.Client") -> bool:
 		return client.name in self
 
 # endregion

@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import asyncio
 import inspect
 from pathlib import Path
-from typing import Optional, Type, TypedDict, Union
+from typing import Dict, Optional, Type, TypedDict, Union
 
 from pyrogram import Client, enums, raw
 from pyrogram.connection import Connection
@@ -11,50 +13,50 @@ from pyrogram.types import LinkPreviewOptions
 
 
 class ClientArgTypes(TypedDict, total=False):
-	api_id: Optional[Union[int, str]]
-	api_hash: Optional[str]
-	app_version: str
-	device_model: str
-	system_version: str
-	lang_pack: str
-	lang_code: str
-	system_lang_code: str
-	ipv6: Optional[bool]
-	proxy: Optional[dict]
-	test_mode: Optional[bool]
-	bot_token: Optional[str]
-	session_string: Optional[str]
-	in_memory: Optional[bool]
-	phone_number: Optional[str]
-	phone_code: Optional[str]
-	password: Optional[str]
-	workers: int
-	workdir: Union[str, Path]
-	plugins: Optional[dict]
-	parse_mode: "enums.ParseMode"
-	no_updates: Optional[bool]
-	skip_updates: Optional[bool]
-	takeout: Optional[bool]
-	sleep_threshold: int
-	hide_password: Optional[bool]
-	max_concurrent_transmissions: int
-	max_message_cache_size: int
-	max_topic_cache_size: int
-	storage_engine: Optional[Storage]
-	client_platform: "enums.ClientPlatform"
-	link_preview_options: Optional[LinkPreviewOptions]
-	fetch_replies: Optional[bool]
-	fetch_topics: Optional[bool]
-	fetch_stories: Optional[bool]
-	fetch_stickers: Optional[bool]
-	init_connection_params: Optional[dict]
-	connection_factory: Type[Connection]
-	protocol_factory: Type[TCP]
-	loop: Optional[asyncio.AbstractEventLoop]
+    api_id: Optional[Union[int, str]]
+    api_hash: Optional[str]
+    app_version: str
+    device_model: str
+    system_version: str
+    lang_pack: str
+    lang_code: str
+    system_lang_code: str
+    ipv6: Optional[bool]
+    proxy: Optional[Union[Dict, str]]
+    test_mode: Optional[bool]
+    bot_token: Optional[str]
+    session_string: Optional[str]
+    in_memory: Optional[bool]
+    phone_number: Optional[str]
+    phone_code: Optional[str]
+    password: Optional[str]
+    workers: int
+    workdir: Union[str, Path]
+    plugins: Optional[Dict]
+    parse_mode: "enums.ParseMode"
+    no_updates: Optional[bool]
+    skip_updates: Optional[bool]
+    takeout: Optional[bool]
+    sleep_threshold: int
+    hide_password: Optional[bool]
+    max_concurrent_transmissions: int
+    max_message_cache_size: int
+    max_topic_cache_size: int
+    storage_engine: Optional[Storage]
+    client_platform: "enums.ClientPlatform"
+    link_preview_options: Optional[LinkPreviewOptions]
+    fetch_replies: Optional[bool]
+    fetch_topics: Optional[bool]
+    fetch_stories: Optional[bool]
+    fetch_stickers: Optional[bool]
+    init_connection_params: Optional[Dict]
+    connection_factory: Type[Connection]
+    protocol_factory: Type[TCP]
+    loop: Optional[asyncio.AbstractEventLoop]
 
 __fullargspec = inspect.getfullargspec(Client)
 if __fullargspec.defaults is None:
     # pyromod patched the client and we cannot access it
-    __fullargspec = inspect.getfullargspec(Client.old__init__) # type: ignore
-__diff: int = len(__fullargspec.args) - len(__fullargspec.defaults) # type: ignore
-default_args: ClientArgTypes = {key: value for key, value in zip(__fullargspec.args[__diff:], __fullargspec.defaults)} # type: ignore
+    __fullargspec = inspect.getfullargspec(Client.old__init__)
+__diff: int = len(__fullargspec.args) - len(__fullargspec.defaults)
+default_args: ClientArgTypes = {key: value for key, value in zip(__fullargspec.args[__diff:], __fullargspec.defaults)}
