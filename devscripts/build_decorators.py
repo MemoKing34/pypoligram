@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
+import sys
 from pathlib import Path
 
-pyrogram_dec = Path(".venv") / 'lib' / 'python3.13' / 'site-packages' / 'pyrogram' / 'methods' / 'decorators'
-pypoligram_dec = Path("pypoligram") / 'decorators'
-pypoligram_dec = Path("downloads") / 'decorators'; pypoligram_dec.mkdir(parents=True, exist_ok=True)
+pyrogram_dec = Path(".venv") / 'lib' / f'python3.{sys.version_info.minor}' / 'site-packages' / 'pyrogram' / 'methods' / 'decorators'
+if '--release' in sys.argv:
+    pypoligram_dec = Path("pypoligram") / 'decorators'
+else:
+    pypoligram_dec = Path("downloads") / 'decorators'
+    pypoligram_dec.mkdir(parents=True, exist_ok=True)
 initpy_path = pypoligram_dec / '__init__.py'
 
 CLIENT_FILTERS_DOCLINES = [
@@ -44,13 +50,11 @@ INITPY_CONTENT = {
 
 names: list[tuple[str, str]] = []
 for dec_path in pyrogram_dec.glob('on_*.py'):
-    poli_dec_path = pypoligram_dec/dec_path.name
-    if pypoligram_dec.parent.name == 'pypoligram' and poli_dec_path.exists():
-        continue
+    poli_dec_path = pypoligram_dec / dec_path.name
     code_lines: list[str] = []
     delete_lines: int = 0
-    class_name: str = None   # pyright: ignore[reportAssignmentType]
-    handler_name: str = None # pyright: ignore[reportAssignmentType]
+    class_name: str | None = None
+    handler_name: str | None = None
     only_self: bool = False
     with dec_path.open() as dec_file:
         for line in dec_file:
@@ -67,7 +71,7 @@ for dec_path in pyrogram_dec.glob('on_*.py'):
                 line = 'from typing import Callable, Optional, Union\n'
 
             if line.startswith('class On'):
-                class_name = line.lstrip('class ').rstrip(':\n')
+                class_name = line.removeprefix('class ').removesuffix(':\n').strip()
                 _index = code_lines.index('import pyrogram\n')
                 if 'from pyrogram.filters import Filter\n' != code_lines[_index+1]:
                     for _i, _line in enumerate(IMPORT_LINES, _index+1):
@@ -138,15 +142,15 @@ for dec_path in pyrogram_dec.glob('on_*.py'):
 
 
     with poli_dec_path.open('w') as poli_dec_file:
-        poli_dec_file.writelines(code_lines)
+        #poli_dec_file.writelines(code_lines)
+        for code_line in code_lines:
+            _ = poli_dec_file.write(code_line.expandtabs(4))
 
-if pypoligram_dec.parent.name == 'pypoligram' and initpy_path.exists():
-    pass
-else:
-    lines: dict[bool, list[str]] = {False: [], True: []}
-    for module_name, ClassName in names:
-        lines[False].append(INITPY_CONTENT[False].format(module_name, ClassName))
-        lines[True].append(INITPY_CONTENT[True].format(ClassName))
-    _ = initpy_path.write_text(
-        INITPY_FILE.format(''.join(lines[False]), ''.join(lines[True]))
-    )
+
+lines: dict[bool, list[str]] = {False: [], True: []}
+for module_name, ClassName in names:
+    lines[False].append(INITPY_CONTENT[False].format(module_name, ClassName))
+    lines[True].append(INITPY_CONTENT[True].format(ClassName))
+_ = initpy_path.write_text(
+    INITPY_FILE.format(''.join(lines[False]), ''.join(lines[True]).expandtabs(4))
+)
