@@ -14,7 +14,7 @@ class Dispatcher(dispatcher.Dispatcher):
 		self.clients = clients
 		super().__init__(client)
 
-	async def handler_worker(self, lock):
+	async def handler_worker(self, lock = None):
 		while True:
 			packet = await self.updates_queue.get()
 
