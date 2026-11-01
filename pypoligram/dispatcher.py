@@ -1,3 +1,4 @@
+import contextlib
 import inspect
 import logging
 
@@ -31,7 +32,7 @@ class Dispatcher(dispatcher.Dispatcher):
 					else (None, type(None))
 				)
 
-				async with lock:
+				async with (lock or contextlib.nullcontext):
 					for group in self.groups.values():
 						for handler in group:
 							args = None
