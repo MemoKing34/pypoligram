@@ -1,14 +1,27 @@
-from typing import Callable, Optional, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import pyrogram
 
 import pypoligram
 from pypoligram.filters import ALL
-from pypoligram.filters import Filter as PFilter
+
+from .unbound_arguments import unbound_arguments
+
+if TYPE_CHECKING:
+	from collections.abc import Callable
+
+	from pyrogram.methods.decorators.handler_type import HandlerType
+
+	from pypoligram.filters import Filter as PFilter
 
 
 class OnStart:
-	def on_start(self: Optional[Union["OnStart", PFilter]] = None, client_filters: Optional[PFilter] = None) -> Callable:
+	def on_start(
+		self: OnStart | PFilter | None = None,
+		client_filters: PFilter | None = None,
+	) -> Callable[[HandlerType], HandlerType]:
 		"""Decorator for handling client start.
 
 		This does the same thing as :meth:`~pypoligram.ClientManager.add_handler` using the
@@ -20,17 +33,26 @@ class OnStart:
 				in your function.
 		"""
 
-		def decorator(func: Callable) -> Callable:
-			nonlocal self, client_filters
+		def decorator(func: HandlerType) -> HandlerType:
+			arguments = unbound_arguments(
+				self,
+				client_filters=client_filters,
+				filters=None,
+				group=0,
+			)
+			handler = pyrogram.handlers.StartHandler(func)
+
 			if isinstance(self, pypoligram.ClientManager):
-				self.add_handler(pyrogram.handlers.StartHandler(func), client_filters or ALL)
+				self.add_handler(
+					handler, arguments.client_filters or ALL, arguments.group
+				)
 			else:
 				if not hasattr(func, "handlers"):
 					func.handlers = []
-				if isinstance(self, PFilter) or self is None:
-					client_filters, self = self, client_filters
 
-				func.handlers.append((pyrogram.handlers.StartHandler(func), 0))
+				func.handlers.append(
+					(handler, arguments.client_filters or ALL, arguments.group)
+				)
 
 			return func
 

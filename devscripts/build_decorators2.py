@@ -23,6 +23,10 @@ Usage::
     python devscripts/build_decorators2.py --check    # diff against pypoligram/decorators
 """
 
+# Damn AI that wasn't bad. Anyway I tested it and it works as intended.
+# Decorators still needs manual review but this script makes my job easier.
+# Everything seemed normal I hope I am not wrong.
+
 from __future__ import annotations
 
 import argparse

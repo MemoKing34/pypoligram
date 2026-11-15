@@ -1,21 +1,31 @@
-from typing import Callable, Optional, Sequence, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import pyrogram
-from pyrogram.filters import Filter
 
 import pypoligram
 from pypoligram.filters import ALL
-from pypoligram.filters import Filter as PFilter
+
+from .unbound_arguments import unbound_error_arguments
+
+if TYPE_CHECKING:
+	from collections.abc import Callable, Sequence
+
+	from pyrogram.filters import Filter
+	from pyrogram.methods.decorators.handler_type import HandlerType
+
+	from pypoligram.filters import Filter as PFilter
 
 
 class OnError:
 	def on_error(
-		self: Optional[Union["OnError", PFilter, Filter]] = None,
-		exceptions: Optional[Union[Exception, Sequence[Exception]]] = None,
-		client_filters: Optional[Union[PFilter, Filter]] = None,
-		filters: Optional[Filter] = None,
+		self: OnError | Exception | Sequence[Exception] | PFilter | Filter | None = None,
+		exceptions: Exception | Sequence[Exception] | None = None,
+		client_filters: PFilter | Filter | None = None,
+		filters: Filter | None = None,
 		group: int = 0,
-	) -> Callable:
+	) -> Callable[[HandlerType], HandlerType]:
 		"""Decorator for handling unexpected errors.
 
 		This does the same thing as :meth:`~pypoligram.ClientManager.add_handler` using the
@@ -31,34 +41,35 @@ class OnError:
 				in your function.
 
 			filters (:obj:`~pyrogram.filters`, *optional*):
-				Pass one or more filters to allow only a subset of messages to be passed
+				Pass one or more filters to allow only a subset of errors to be passed
 				in your function.
 
 			group (``int``, *optional*):
 				The group identifier, defaults to 0.
-
-		Parameters:
-			client_filters (:obj:`~pypoligram.filters`, *optional*):
-				Pass one or more filters to allow only a subset of clients to be passed
-				in your function.
 		"""
 
-		def decorator(func: Callable) -> Callable:
-			nonlocal self, client_filters, filters, group
+		def decorator(func: HandlerType) -> HandlerType:
+			arguments = unbound_error_arguments(
+				self,
+				exceptions=exceptions,
+				client_filters=client_filters,
+				filters=filters,
+				group=group,
+			)
+			handler = pyrogram.handlers.ErrorHandler(
+				func, arguments.exceptions, arguments.filters
+			)
+
 			if isinstance(self, pypoligram.ClientManager):
-				self.add_handler(pyrogram.handlers.ErrorHandler(func, filters), client_filters or ALL, group)
+				self.add_handler(
+					handler, arguments.client_filters or ALL, arguments.group
+				)
 			else:
 				if not hasattr(func, "handlers"):
 					func.handlers = []
-				if isinstance(self, PFilter):
-					client_filters, self = self, client_filters
-				if isinstance(self, Filter):
-					filters, self = self, filters
-				if isinstance(self, int):
-					group = self or 0
 
 				func.handlers.append(
-					(pyrogram.handlers.ErrorHandler(func, exceptions, filters), group)
+					(handler, arguments.client_filters or ALL, arguments.group)
 				)
 
 			return func

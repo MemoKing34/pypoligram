@@ -1,25 +1,35 @@
-from typing import Callable, Optional, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import pyrogram
-from pyrogram.filters import Filter
 
 import pypoligram
 from pypoligram.filters import ALL
-from pypoligram.filters import Filter as PFilter
+
+from .unbound_arguments import unbound_arguments
+
+if TYPE_CHECKING:
+	from collections.abc import Callable
+
+	from pyrogram.filters import Filter
+	from pyrogram.methods.decorators.handler_type import HandlerType
+
+	from pypoligram.filters import Filter as PFilter
 
 
 class OnStory:
 	def on_story(
-		self: Union["OnStory", PFilter, Filter, None] = None,
-		client_filters: Union[PFilter, Filter, None] = None,
-		filters: Union[Filter, None] = None,
-		group: int = 0
-	) -> Callable:
-		"""Decorator for handling stories.
-  
+		self: OnStory | PFilter | Filter | None = None,
+		client_filters: PFilter | Filter | None = None,
+		filters: Filter | None = None,
+		group: int = 0,
+	) -> Callable[[HandlerType], HandlerType]:
+		"""Decorator for handling new stories.
+
 		This does the same thing as :meth:`~pypoligram.ClientManager.add_handler` using the
 		:obj:`~pyrogram.handlers.StoryHandler`.
-  
+
 		Parameters:
 			client_filters (:obj:`~pypoligram.filters`, *optional*):
 				Pass one or more filters to allow only a subset of clients to be passed
@@ -28,31 +38,30 @@ class OnStory:
 			filters (:obj:`~pyrogram.filters`, *optional*):
 				Pass one or more filters to allow only a subset of stories to be passed
 				in your function.
-	
+
 			group (``int``, *optional*):
 				The group identifier, defaults to 0.
 		"""
 
-		def decorator(func: Callable) -> Callable:
-			nonlocal self, client_filters, filters, group
+		def decorator(func: HandlerType) -> HandlerType:
+			arguments = unbound_arguments(
+				self,
+				client_filters=client_filters,
+				filters=filters,
+				group=group,
+			)
+			handler = pyrogram.handlers.StoryHandler(func, arguments.filters)
+
 			if isinstance(self, pypoligram.ClientManager):
-				self.add_handler(pyrogram.handlers.StoryHandler(func, filters), client_filters or ALL, group)
-			elif isinstance(self, Union[PFilter, Filter]) or self is None:
+				self.add_handler(
+					handler, arguments.client_filters or ALL, arguments.group
+				)
+			else:
 				if not hasattr(func, "handlers"):
 					func.handlers = []
-				if isinstance(self, PFilter):
-					client_filters, self = self, client_filters
-				if isinstance(self, Filter):
-					filters, self = self, filters
-				if isinstance(self, int):
-					group = self or 0
 
 				func.handlers.append(
-					(
-						pyrogram.handlers.StoryHandler(func, filters),
-						client_filters or ALL,
-						group
-					)
+					(handler, arguments.client_filters or ALL, arguments.group)
 				)
 
 			return func
