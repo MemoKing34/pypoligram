@@ -1,6 +1,9 @@
 # Pypoligram
 Pypoligram is a Python package designed to manage multiple `pyrogram.Client` instances efficiently. It simplifies the process of handling multiple clients.
 
+> [!WARNING]
+> For now only officially supported pyrogram fork is [kurigram](https://github.com/kurigram-org/kurigram). Even though I plan to support all known forks I don't have time nor energy to do that. If it does not work you I am trully sorry.
+
 ## Features
 
 - Efficiently manage multiple `pyrogram.Client` instances with ease.
