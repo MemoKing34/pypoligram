@@ -56,6 +56,7 @@ for dec_path in pyrogram_dec.glob('on_*.py'):
     class_name: str | None = None
     handler_name: str | None = None
     only_self: bool = False
+    imported: bool = False
     with dec_path.open() as dec_file:
         for line in dec_file:
             if line.startswith('#'):
@@ -65,33 +66,34 @@ for dec_path in pyrogram_dec.glob('on_*.py'):
                 delete_lines -= 1
                 continue
 
-            if 'from typing import Callable\n' == line:
-                line = 'from typing import Callable, Optional\n'
-            if 'from typing import Callable, Optional\n' == line:
-                line = 'from typing import Callable, Optional, Union\n'
+            if 'from typing import TYPE_CHECKING\n' == line:
+                line = 'from typing import TYPE_CHECKING, Optional\n'
+            if 'from typing import TYPE_CHECKING, Optional\n' == line:
+                line = 'from typing import TYPE_CHECKING, Optional, Union\n'
+            if 'from .handler_type import HandlerType' == line.strip():
+                line = line.replace('.handler_type', 'pyrogram.methods.decorators.handler_type')
 
             if line.startswith('class On'):
                 class_name = line.removeprefix('class ').removesuffix(':\n').strip()
                 _index = code_lines.index('import pyrogram\n')
-                if 'from pyrogram.filters import Filter\n' != code_lines[_index+1]:
+                if 'from pyrogram.filters import Filter\n' != code_lines[_index+1] and (not imported):
                     for _i, _line in enumerate(IMPORT_LINES, _index+1):
                         code_lines.insert(_i, _line)
+                    imported = True
                 names.append((poli_dec_path.stem, class_name))
 
             if line.strip().startswith('def on_') and 'self' in line:
-                line = line.replace(f'Optional["{class_name}"]', f'Optional[Union["{class_name}", PFilter]] = None, client_filters: Optional[PFilter]')
+                line = line.replace(f'{class_name} | None', f'{class_name} | PFilter | None = None, client_filters: PFilter | None')
                 only_self = True
 
             if line.strip().startswith('self'):
-                if 'self=None,' == line.strip():
-                    line = line.replace('self=None', f'self: Optional[Union["{class_name}", Filter]] = None')
-                line = line.replace(f'Union["{class_name}", Filter, None]', f'Optional[Union["{class_name}", Filter]]')
-                line = line.replace('Filter', 'PFilter, Filter')
+                line = line.replace('Filter', 'PFilter | Filter')
 
             if line.strip().startswith('filters') and line.endswith(',\n'):
-                if 'filters=None,' == line.strip():
-                    line = line.replace('filters=None', 'filters: Optional[Filter] = None')
-                code_lines.append("\t\tclient_filters: Optional[Union[PFilter, Filter]] = None,\n")
+                if 'filters=filters,' == line.strip():
+                    code_lines.append("\t\t\t\t\tclient_filters=client_filters,\n")
+                else:
+                    code_lines.append("\t\tclient_filters: PFilter | Filter | None = None,\n")
 
             if 'pyrogram.Client.add_handler' in line:
                 line = line.replace('pyrogram.Client.add_handler', 'pypoligram.ClientManager.add_handler')
@@ -103,7 +105,6 @@ for dec_path in pyrogram_dec.glob('on_*.py'):
                 code_lines.extend(CLIENT_FILTERS_DOCLINES)
             if '"""' == line.strip():
                 try:
-                    _index = code_lines.index('        Parameters:\n')
                     _index = code_lines.index('\t\tParameters:\n')
                 except ValueError:
                     code_lines.extend(['\n', '\t\tParameters:\n'] + CLIENT_FILTERS_DOCLINES[:-1])
@@ -114,31 +115,32 @@ for dec_path in pyrogram_dec.glob('on_*.py'):
             if 'if isinstance(self, pyrogram.Client):' == line.strip():
                 line = line.replace('pyrogram.Client', 'pypoligram.ClientManager')
 
-            if line.strip().startswith('self.add_handler(pyrogram.handlers.'):
-                if only_self:
-                    line = f'\t\t\t\tself.add_handler(pyrogram.handlers.{handler_name}(func), client_filters or ALL)\n'
-                else:
-                    line = f'\t\t\t\tself.add_handler(pyrogram.handlers.{handler_name}(func, filters), client_filters or ALL, group)\n'
+            if f'(pyrogram.handlers.{handler_name}(func))' in line:
+                line = line.replace(f'(pyrogram.handlers.{handler_name}(func))', f'(pyrogram.handlers.{handler_name}(func), client_filters or ALL)')
+            if f'pyrogram.handlers.{handler_name}(func, filters), group' in line:
+                line = line.replace(f'pyrogram.handlers.{handler_name}(func, filters), group', f'pyrogram.handlers.{handler_name}(func, filters), client_filters or ALL, group')
+            if f'pyrogram.handlers.{handler_name}(func, exceptions, filters), group' in line:
+                line = line.replace(f'pyrogram.handlers.{handler_name}(func, exceptions, filters), group', f'pyrogram.handlers.{handler_name}(func, exceptions, filters), client_filters or ALL, group')
 
-            if line.startswith('func.handlers.append') and line.endswith('))') and only_self:
+            if 'unbound_arguments(self, filters=filters, group=group)' in line:
+                line = line.replace('unbound_arguments(self, filters=filters, group=group)', 'unbound_arguments(self, client_filters=client_filters, filters=filters, group=group)')
+            
+            if line.strip().startswith('func.handlers.append') and line.endswith('))\n') and only_self:
                 line = f'\t\t\t\tfunc.handlers.append((pyrogram.handlers.{handler_name}(func), client_filters or ALL, 0))\n'
 
+            if f'(pyrogram.handlers.{handler_name}(func, arguments.filters), arguments.group)' in line:
+                line = line.replace(f'(pyrogram.handlers.{handler_name}(func, arguments.filters), arguments.group)', f'(pyrogram.handlers.{handler_name}(func, arguments.filters), arguments.client_filters or ALL, arguments.group)')
+
+            # *************** GOLDEN LINE ***************
             code_lines.append(line.replace('    ', '\t'))
+            # *************** GOLDEN LINE ***************
 
-            if 'from pyrogram.filters import Filter' == line.strip():
+            if 'from pyrogram.filters import Filter\n' == line and (not imported):
                 code_lines.extend(IMPORT_LINES)
+                imported = True
 
-            if 'def decorator(func: Callable) -> Callable:' == line.strip():
-                code_lines.append('\t\t\tnonlocal self, client_filters' + ('\n' if only_self else ', filters, group\n'))
-
-            if 'func.handlers = []' == line.strip():
-                code_lines.extend(SWAP_CODE_LINES[only_self])
-
-            if class_name and f'pyrogram.handlers.{handler_name}(func, self),' == line.strip():
-                line = f'\t\t\t\t\t\tpyrogram.handlers.{handler_name}(func, filters),\n'
-                code_lines[-1] = line
-                delete_lines = 1
-                code_lines.extend(['\t\t\t\t\t\tclient_filters or ALL,\n', '\t\t\t\t\t\tgroup\n'])
+            if 'arguments.group,' == line.strip():
+                code_lines.insert(-1, '\t\t\t\t\t\targuments.client_filters or ALL,\n')
 
 
     with poli_dec_path.open('w') as poli_dec_file:
