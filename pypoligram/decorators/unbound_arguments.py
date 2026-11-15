@@ -1,10 +1,26 @@
 from __future__ import annotations as _annotations
 
-from dataclasses import dataclass
 from collections.abc import Sequence
+from dataclasses import dataclass
 
+import pypoligram
 from pyrogram.filters import Filter
+
 from pypoligram.filters import Filter as PFilter
+
+ExceptionsType = Exception | Sequence[Exception] | None
+
+
+def _given(receiver: object, *values: object) -> tuple[object, ...]:
+    """Drop the receiver when it is the manager instead of a shifted argument.
+
+    A call on the class (`ClientManager.on_message(...)`) puts the first real argument
+    in `receiver`; a call on an instance (`manager.on_message(...)`) puts the manager
+    there instead. Only the first form is shifted.
+    """
+    if isinstance(receiver, pypoligram.ClientManager):
+        return values
+    return (receiver, *values)
 
 
 @dataclass(frozen=True)
@@ -15,7 +31,7 @@ class UnboundArguments:
 
 
 def unbound_arguments(
-    receiver: PFilter | Filter | None,
+    receiver: object,
     *,
     client_filters: PFilter | Filter | int | None,
     filters: Filter | int | None,
@@ -28,20 +44,19 @@ def unbound_arguments(
     arguments were passed. Client filters, update filters and ints don't collide, so each
     value is bucketed by type instead of following the shift.
     """
-    for value in (receiver, client_filters, filters):
+    for value in _given(receiver, client_filters, filters):
         if isinstance(value, PFilter):
             client_filters = value
         elif isinstance(value, Filter):
             filters = value
         elif type(value) is int:
             group = value
+
     return UnboundArguments(
         client_filters if isinstance(client_filters, PFilter) else None,
         filters if isinstance(filters, Filter) else None,
         group,
     )
-
-ExceptionsType = Exception | Sequence[Exception] | None
 
 
 @dataclass(frozen=True)
@@ -53,7 +68,7 @@ class UnboundErrorArguments:
 
 
 def unbound_error_arguments(
-    receiver: ExceptionsType,
+    receiver: object,
     *,
     exceptions: ExceptionsType | PFilter | Filter,
     client_filters: PFilter | Filter | int | None,
@@ -68,10 +83,10 @@ def unbound_error_arguments(
     collide, so each value is bucketed by type instead of following the shift; whatever
     is left is the exception type or instance.
     """
-    _tuple = (receiver, exceptions, client_filters, filters)
+    given = _given(receiver, exceptions, client_filters, filters)
     exceptions = client_filters = filters = None
 
-    for value in _tuple:
+    for value in given:
         if isinstance(value, PFilter):
             client_filters = value
         elif isinstance(value, Filter):
