@@ -6,53 +6,55 @@ from pathlib import Path
 from typing import Dict, Optional, Type, TypedDict, Union
 
 from pyrogram import Client, enums, raw
-from pyrogram.connection import Connection
+from pyrogram.connection import Connection, Proxy
+from pyrogram.connection.proxy import ProxyDict
 from pyrogram.connection.transport import TCP
 from pyrogram.storage import Storage
 from pyrogram.types import LinkPreviewOptions
+from pyrogram._typing import PathType
 
 
 class ClientArgTypes(TypedDict, total=False):
-    api_id: Optional[Union[int, str]]
-    api_hash: Optional[str]
+    api_id: int | str | None
+    api_hash: str | None
     app_version: str
     device_model: str
     system_version: str
     lang_pack: str
     lang_code: str
     system_lang_code: str
-    ipv6: Optional[bool]
-    proxy: Optional[Union[Dict, str]]
-    test_mode: Optional[bool]
-    bot_token: Optional[str]
-    session_string: Optional[str]
-    in_memory: Optional[bool]
-    phone_number: Optional[str]
-    phone_code: Optional[str]
-    password: Optional[str]
+    ipv6: bool
+    proxy: str | ProxyDict | Proxy | None
+    test_mode: bool
+    bot_token: str | None
+    session_string: str | None
+    in_memory: bool | None
+    phone_number: str | None
+    phone_code: str | None
+    password: str | None
     workers: int
-    workdir: Union[str, Path]
-    plugins: Optional[Dict]
-    parse_mode: "enums.ParseMode"
-    no_updates: Optional[bool]
-    skip_updates: Optional[bool]
-    takeout: Optional[bool]
+    workdir: PathType
+    plugins: Dict | None
+    parse_mode: enums.ParseMode
+    no_updates: bool | None
+    skip_updates: bool
+    takeout: bool | None
     sleep_threshold: int
-    hide_password: Optional[bool]
+    hide_password: bool
     max_concurrent_transmissions: int
     max_message_cache_size: int
     max_topic_cache_size: int
-    storage_engine: Optional[Storage]
-    client_platform: "enums.ClientPlatform"
-    link_preview_options: Optional[LinkPreviewOptions]
-    fetch_replies: Optional[bool]
-    fetch_topics: Optional[bool]
-    fetch_stories: Optional[bool]
-    fetch_stickers: Optional[bool]
-    init_connection_params: Optional[Dict]
-    connection_factory: Type[Connection]
-    protocol_factory: Type[TCP]
-    loop: Optional[asyncio.AbstractEventLoop]
+    max_sticker_set_name_cache_size: int
+    storage_engine: Storage | None
+    client_platform: enums.ClientPlatform
+    link_preview_options: LinkPreviewOptions | None
+    fetch_replies: bool
+    fetch_topics: bool
+    fetch_stories: bool
+    fetch_stickers: bool
+    init_connection_params: Dict | raw.base.JSONValue | None
+    connection_factory: type[Connection]
+    protocol_factory: type[TCP]
 
 __fullargspec = inspect.getfullargspec(Client)
 if __fullargspec.defaults is None:
