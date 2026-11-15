@@ -193,6 +193,7 @@ class ClientManager(Decorators):
 				manager.run()
 		"""
 		names = []
+		filters = filters if filters is not None else pALL
 		for client in self:
 			if filters(self, client):
 				client.add_handler(handler, group)
